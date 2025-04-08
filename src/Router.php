@@ -1,7 +1,8 @@
 <?php
 
 namespace stockalignment;
-// use ccms\Controller\AuthenticationController;
+
+use stockalignment\Controller\AuthenticationController;
 // use ccms\Controller\HomeController;
 use Exception;
 
@@ -34,11 +35,11 @@ class Router
         $method =  $_SERVER['REQUEST_METHOD'];
 
         $BASE_URL_QAS = "";
-        if(strpos($uri , "_qas") !== FALSE) {
+        if (strpos($uri, "_qas") !== FALSE) {
             $BASE_URL_QAS = "_qas";
         }
 
-        $uri = str_replace(BASE_URL. $BASE_URL_QAS ,"", $uri);
+        $uri = str_replace(BASE_URL . $BASE_URL_QAS, "", $uri);
 
         // print_r($this->routes);
         // print_r( $method);
@@ -55,40 +56,36 @@ class Router
              * FILTER TO SKIP SESSION
              */
             $arrayUri = explode("/", $_SERVER['REQUEST_URI']);
-            array_splice($arrayUri, 0, 1); 
+            array_splice($arrayUri, 0, 1);
             $skipSession = array(
                 "getStocks",
                 "/",
-                "checklogin",
+                "userAuthen",
                 "getRemittedConsignment",
             );
             // print_r($uri);
             // exit();
             $linkUrl = $arrayUri[1];
-            if(!in_array($linkUrl, $skipSession)) {
-                // if(empty($_SESSION["userno"])) {
-                    
-                //     // $homeController = new HomeController();
-                //     // $homeController->index();
-                //     exit();
-                // }
+            if (!in_array($linkUrl, $skipSession)) {
+                if (empty($_SESSION["userno"])) {
+
+                    $AuthenticationController = new AuthenticationController();
+                    $AuthenticationController->index();
+                    exit();
+                }
             }
 
-            try{
+            try {
                 $controller = new $controller();
                 $controller->$action();
-            }catch(Exception $e){
+            } catch (Exception $e) {
             }
-          
-
         } else {
             // echo "No route found for URI: $uri";
             http_response_code(404);
             // $page404 = new AuthenticationController();
             // $page404->page404();
             exit();
-
         }
     }
 }
-

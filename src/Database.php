@@ -1,14 +1,16 @@
 <?php
 
 namespace stockalignment;
+
 use PDO;
 use PDOException;
 
 
-class Database {
+class Database
+{
 
     private static $instance = null;
-    private $pdo;    
+    private $pdo;
     private $SAPPort;
     private $SAPIP;
     private $SAPUser;
@@ -19,7 +21,8 @@ class Database {
 
 
 
-    private function __construct() {
+    private function __construct()
+    {
         $host = getenv('DB_HOST'); // Use environment variables for secrets
         $dbname = getenv('DB_NAME');
         $username = getenv('DB_USERNAME');
@@ -30,15 +33,16 @@ class Database {
 
 
         // detect cli php_sapi_name();
-       
+
         $absolutePath =  __FILE__;
 
         $this->SAPIP = "10.0.220.168";
 
 
         $dbname = "";
-        if(strpos($_SERVER['HTTP_HOST'], "localhost") !== false || strpos($_SERVER['REQUEST_URI'], "localhost") !== false 
-        ||strpos(strtoupper($absolutePath), "QAS") !== FALSE
+        if (
+            strpos($_SERVER['HTTP_HOST'], "localhost") !== false || strpos($_SERVER['REQUEST_URI'], "localhost") !== false
+            || strpos(strtoupper($absolutePath), "QAS") !== FALSE
         ) {
             $dbname = "_qas";
             $this->SAPPort = "8001";
@@ -60,41 +64,48 @@ class Database {
         try {
             $this->pdo = new PDO("pgsql:host=$host;dbname=$dbname", $username, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException $e) {
+        } catch (PDOException $e) {
             die("Error connecting to database: " . $e->getMessage());
         }
     }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance == null) {
             self::$instance = new self;
         }
         return self::$instance;
     }
 
-    public function getPdo() {
+    public function getPdo()
+    {
         return $this->pdo;
     }
-    public function getSAPPort() {
+    public function getSAPPort()
+    {
         return $this->SAPPort;
     }
-    public function getSAPIP() {
+    public function getSAPIP()
+    {
         return $this->SAPIP;
     }
-    public function getDBase() {
+    public function getDBase()
+    {
         return $this->DBASE;
     }
-    public function getSAPUser() {
+    public function getSAPUser()
+    {
         return $this->SAPUser;
     }
-    public function getSAPPword() {
+    public function getSAPPword()
+    {
         return $this->SAPPword;
     }
 
-    public function getSQLRow(String $sql , array $params ){
+    public function getSQLRow(String $sql, array $params)
+    {
         $statement = $this->pdo->prepare($sql);
         $statement->execute($params);
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
-    
 }
