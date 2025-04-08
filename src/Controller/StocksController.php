@@ -1,7 +1,8 @@
-<?php 
+<?php
 
 
 namespace stockalignment\Controller;
+
 use stockalignment\Database;
 use stockalignment\Model\DatabaseModel;
 use stockalignment\Controller;
@@ -14,15 +15,18 @@ use Exception;
 
 use stockalignment\Classes\SAP;
 
-class StocksController extends Controller {
+class StocksController extends Controller
+{
 
     public $database = null;
 
-    public function __construct() {
-        $this->database = Database::getInstance();       
+    public function __construct()
+    {
+        $this->database = Database::getInstance();
     }
 
-    public function getStocks(){
+    public function getStocks()
+    {
 
         // echo "ddd" ;
         // print_r($_GET);
@@ -36,7 +40,7 @@ class StocksController extends Controller {
         $clsSAP = new SAP();
 
 
-        $param = "INVENTORY|".$materialcode ."|"."" ;
+        $param = "INVENTORY|" . $materialcode . "|" . "";
 
         // echo $param;
 
@@ -47,10 +51,6 @@ class StocksController extends Controller {
         $sapData = $clsSAP->executeRFCToSAP($this->database->getSAPUser(), $this->database->getSAPPword(), $SAPUrl, $params);
         $sapReturn = $sapData["response"];
 
-        print_r($sapReturn ) ;
+        print_r($sapReturn);
     }
-
-
-
-
 }
