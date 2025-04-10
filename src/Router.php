@@ -62,6 +62,7 @@ class Router
                 "/",
                 "userAuthen",
                 "getRemittedConsignment",
+                "getItemFromShopee",
             );
             // print_r($uri);
             // exit();

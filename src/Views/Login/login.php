@@ -14,7 +14,10 @@
             <form class="space-y-6" id="loginForm" method="POST" action="<?= "userAuthen"; ?>">
                 <!-- <h5 class="text-xl font-medium text-gray-900 dark:text-white">Sign in to our platform</h5> -->
                 <div class="flex flex-col items-center pb-10">
-                    <img class="rounded-t-lg" src="Assets/Logo/uratex_only.png" alt="Uratex" />
+                    <figure>
+                        <img class="rounded-t-lg" src="Assets/Logo/uratex_only.png" alt="Uratex Logo" />
+                        <!-- <caption>Uratex Logo</caption> -->
+                    </figure>
                     <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">Stock Alignment</h5>
                     <span class="text-sm text-gray-500 dark:text-gray-400">LOGIN</span>
                 </div>
