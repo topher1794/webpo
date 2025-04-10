@@ -14,5 +14,6 @@ $router->get('/', stockalignment\Controller\AuthenticationController::class, 'in
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
 $router->post('/userAuthen', stockalignment\Controller\AuthenticationController::class, 'userAuthenticate');
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
+$router->get('/getItemFromShopee', stockalignment\Controller\StocksController::class, 'getItemFromShopee');
 
 $router->dispatch();
