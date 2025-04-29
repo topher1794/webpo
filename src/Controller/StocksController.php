@@ -6,6 +6,8 @@ namespace stockalignment\Controller;
 use stockalignment\Database;
 use stockalignment\Model\DatabaseModel;
 use stockalignment\Controller;
+use Lazada\LazopClient;
+use Lazada\LazopRequest;
 
 use PDO;
 // use Firebase\JWT\JWT;
@@ -152,5 +154,20 @@ class StocksController extends Controller
         // print_r($curl);
         curl_close($curl);
         echo $response;
+    }
+    function getAccessTokenLazada()
+    {
+        $url = "https://api.lazada.com/rest";
+        $appkey = "133053";
+        $appSecret = 'M4V8k89Nv5pYtT7eafdFlxfDZsDOSaBY';
+        $code = '0_133053_BSLOsztup8ptwkoufwMNaYZD4348';
+
+        $c = new LazopClient($url,  $appkey, $appSecret);
+        $request = new LazopRequest('/auth/token/create');
+        $request->addApiParam('code', $code);
+        // $request->addApiParam('uuid', 'This field is currently invalid,  do not use this field please');
+        var_dump($c->execute($request));
+
+        print_r("sfsf " ) ;
     }
 }

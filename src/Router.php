@@ -3,6 +3,7 @@
 namespace stockalignment;
 
 use stockalignment\Controller\AuthenticationController;
+
 // use ccms\Controller\HomeController;
 use Exception;
 
@@ -64,7 +65,7 @@ class Router
                 "getRemittedConsignment",
                 "getItemFromShopee",
                 "getAccessToken",
-
+                "getAccessTokenLazada",
             );
             // print_r($uri);
             // exit();

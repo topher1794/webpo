@@ -5,6 +5,7 @@
         }
     },
     "require": {
-        "firebase/php-jwt": "^6.10"
+        "firebase/php-jwt": "^6.10",
+        "appolous/lazada-php-sdk": "^1.6"
     }
 }
