@@ -2,7 +2,7 @@
 
 namespace stockalignment\Controller;
 
-use stockalignment\Database;
+use stockalignment\Core\Database;
 use stockalignment\Controller;
 use stockalignment\Jwt;
 use PDO;
@@ -34,7 +34,7 @@ class AuthenticationController extends Controller
     public function index()
     {
         $data['title'] = "LOGIN";
-        $haveSession = $_SESSION["userno"];
+        $haveSession = $_SESSION["userno"] ?? "";
         if (!empty($haveSession)) {
             // $controller = new AuthenticationController();
             $this->dashboard();

@@ -11,6 +11,7 @@ $router = new Router();
  * 
  */
 $router->get('/', stockalignment\Controller\AuthenticationController::class, 'index');
+$router->get('/login', stockalignment\Controller\AuthenticationController::class, 'index');
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
 $router->post('/userAuthen', stockalignment\Controller\AuthenticationController::class, 'userAuthenticate');
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
@@ -18,6 +19,9 @@ $router->get('/getItemFromShopee', stockalignment\Controller\StocksController::c
 $router->get('/getAccessToken', stockalignment\Controller\StocksController::class, 'getAccessToken');
 
 $router->get('/getAccessTokenLazada', stockalignment\Controller\StocksController::class, 'getAccessTokenLazada');
+
+$router->get('/registration', stockalignment\Controller\RegistrationController::class, 'registration');
+
 
 
 $router->dispatch();

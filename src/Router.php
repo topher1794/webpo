@@ -2,10 +2,12 @@
 
 namespace stockalignment;
 
+use stockalignment\Core\Database;
 use stockalignment\Controller\AuthenticationController;
 
 // use ccms\Controller\HomeController;
 use Exception;
+use stockalignment\Model\UserModel;
 
 define('BASE_URL', '/stockalignproj');
 
@@ -32,6 +34,10 @@ class Router
 
     public function dispatch()
     {
+
+        $database = Database::getInstance();
+
+        $pdo =  $database->getPdo();
         $uri = strtok($_SERVER['REQUEST_URI'], '?');
         $method =  $_SERVER['REQUEST_METHOD'];
 
@@ -66,6 +72,7 @@ class Router
                 "getItemFromShopee",
                 "getAccessToken",
                 "getAccessTokenLazada",
+                "registration",
             );
             // print_r($uri);
             // exit();
@@ -80,7 +87,15 @@ class Router
             }
 
             try {
-                $controller = new $controller();
+                $model = null;
+                switch($linkUrl) {
+                    case "registration" :
+                        $model = new UserModel( $pdo);
+                        break;
+                    default:
+                        $model = null;
+                }
+                $controller = new $controller($model);
                 $controller->$action();
             } catch (Exception $e) {
             }
