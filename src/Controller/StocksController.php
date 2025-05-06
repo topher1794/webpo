@@ -3,7 +3,7 @@
 
 namespace stockalignment\Controller;
 
-use stockalignment\Database;
+use stockalignment\Core\Database;
 use stockalignment\Model\DatabaseModel;
 use stockalignment\Controller;
 use Lazada\LazopClient;
@@ -25,6 +25,14 @@ class StocksController extends Controller
     public function __construct()
     {
         $this->database = Database::getInstance();
+    }
+
+    public function dashboard(){
+        $data['logs'] = $_POST;
+        $this->render('Template/header.php', $data);
+        $this->render('Dashboard/dashboard.php', $data);
+        $this->render('Template/footer.php', $data);
+
     }
 
     public function getStocks()

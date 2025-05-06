@@ -74,7 +74,9 @@ class Router
                 "getAccessTokenLazada",
                 "registration",
                 "newRegistration",
+                "dashboard",
 
+                
             );
             // print_r($uri);
             // exit();

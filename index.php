@@ -24,6 +24,9 @@ $router->get('/registration', stockalignment\Controller\RegistrationController::
 $router->post('/newRegistration', stockalignment\Controller\RegistrationController::class, 'newRegistration');
 
 
+$router->get('/dashboard', stockalignment\Controller\StocksController::class, 'dashboard');
+
+
 
 
 $router->dispatch();
