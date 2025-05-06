@@ -2,6 +2,7 @@
 
 namespace stockalignment\Controller;
 
+use PhpParser\PrettyPrinter;
 use stockalignment\Model\UserModel;
 use stockalignment\Controller;
 
@@ -21,8 +22,15 @@ class RegistrationController extends Controller
         $this->render('Login/register.php', $data);
     }
 
+    public function newRegistration() {
+        $username = $_POST["username"] ?? "";
+        $email = $_POST["email"] ?? "";
+        $password = $_POST["password"] ?? "";
+        $confirmpassword = $_POST["confirm-password"] ?? "";   
+        echo json_encode($this->register($username, $email, $password, $confirmpassword), JSON_PRETTY_PRINT );
+    }
 
-    public function register(string $email, string $password): array
+    public function register(string $username, string $email, string $password, string $newPassword): array
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return ['status' => 400, 'message' => 'Invalid email format'];
@@ -36,9 +44,15 @@ class RegistrationController extends Controller
             return ['status' => 409, 'message' => 'Email already registered'];
         }
 
-        $hash = password_hash($password, PASSWORD_BCRYPT);
-        $this->userModel->createUser($email, $hash);
+        if($password != $newPassword){
+            return ['status' => 400, 'message' => 'Password is not the same'];
+        }
 
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $this->userModel->createUser($username, $email, $hash);
+        
         return ['status' => 201, 'message' => 'User registered'];
     }
+
+
 }

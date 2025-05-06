@@ -73,6 +73,8 @@ class Router
                 "getAccessToken",
                 "getAccessTokenLazada",
                 "registration",
+                "newRegistration",
+
             );
             // print_r($uri);
             // exit();
@@ -90,6 +92,7 @@ class Router
                 $model = null;
                 switch($linkUrl) {
                     case "registration" :
+                    case "newRegistration" :
                         $model = new UserModel( $pdo);
                         break;
                     default:

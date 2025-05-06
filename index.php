@@ -21,6 +21,8 @@ $router->get('/getAccessToken', stockalignment\Controller\StocksController::clas
 $router->get('/getAccessTokenLazada', stockalignment\Controller\StocksController::class, 'getAccessTokenLazada');
 
 $router->get('/registration', stockalignment\Controller\RegistrationController::class, 'registration');
+$router->post('/newRegistration', stockalignment\Controller\RegistrationController::class, 'newRegistration');
+
 
 
 
