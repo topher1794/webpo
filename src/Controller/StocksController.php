@@ -14,6 +14,7 @@ use PDO;
 use Firebase\JWT\Key;
 use InvalidArgumentException;
 use Exception;
+use stockalignment\Controller\AuthenticationController;
 
 use stockalignment\Classes\SAP;
 
@@ -27,48 +28,50 @@ class StocksController extends Controller
     {
         $this->database = Database::getInstance();
     }
-    
 
-    public function dashboard(){
+
+    public function dashboard()
+    {
         $data['logs'] = $_POST;
         $this->render('Template/header.php', $data);
         $this->render('Template/sidebar.php', $data);
         $this->render('Dashboard/dashboard.php', $data);
         $this->render('Template/footer.php', $data);
-
     }
 
 
-    public function syncapi(){
-         // get Bearer
+    public function syncapi()
+    {
+        // get Bearer
 
-         if(array_key_exists("Authorization", getallheaders())) {
+        if (array_key_exists("Authorization", getallheaders())) {
 
-            if(strpos( getallheaders()["Authorization"], "Bearer" ) === FALSE) {
+            if (strpos(getallheaders()["Authorization"], "Bearer") === FALSE) {
                 http_response_code(400);
                 echo json_encode(["message" => "Bearer is required."]);
                 exit();
             }
-        }else{
+        } else {
             http_response_code(400);
             echo json_encode(["message" => "Authentication is required."]);
             exit();
         }
 
-        $bearerToken = getallheaders()["Authorization"] ??"";
-        $bearerToken = str_replace("Bearer ","", $bearerToken);
+        $bearerToken = getallheaders()["Authorization"] ?? "";
+        $bearerToken = str_replace("Bearer ", "", $bearerToken);
     }
 
-    public function syncviaform(){
-        
-        $userid = $_POST["userid"] ??"";
-        $empname = $_POST["empname"] ??"";
-        $qty = $_POST["qty"] ??"";
+    public function syncviaform()
+    {
+
+        $userid = $_POST["userid"] ?? "";
+        $empname = $_POST["empname"] ?? "";
+        $qty = $_POST["qty"] ?? "";
 
         $data = array(
-                "userid" => $userid 
-                ,"empname" => $empname
-                ,"qty" => $qty
+            "userid" => $userid,
+            "empname" => $empname,
+            "qty" => $qty
         );
 
         print_r($_POST);
@@ -78,7 +81,8 @@ class StocksController extends Controller
 
 
 
-    public function syncStock(array $data){
+    public function syncStock(array $data)
+    {
 
         $pdo = $this->database->getPdo();
 
@@ -86,7 +90,7 @@ class StocksController extends Controller
          * 
          * get user id who requested the sync and empname
          * 
-        */
+         */
 
         $userid = $data["userid"];
         $empname = $data["empname"];
@@ -95,7 +99,7 @@ class StocksController extends Controller
         /**
          * get stocks from SAP
          * 
-        */
+         */
 
         $sqlSettings = "SELECT attributez  FROM StockAlignSettings where settingstype =:settingstype";
         $statement = $pdo->prepare($sqlSettings);
@@ -105,10 +109,10 @@ class StocksController extends Controller
 
         print_r($settingsInfo);
 
-        exit(); 
-         /**
-          * Allocation 60/40 round up
-          */
+        exit();
+        /**
+         * Allocation 60/40 round up
+         */
 
         //   call syncEcomStock
 
@@ -116,16 +120,19 @@ class StocksController extends Controller
 
     }
 
-    public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool {
+    public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
+    {
 
         return true;
     }
 
-    public function syncLazadaStock(string $transactId, int $qty): bool {
+    public function syncLazadaStock(string $transactId, int $qty): bool
+    {
         return true;
     }
 
-    public function syncShopeeStock(string $transactId, int $qty): bool {
+    public function syncShopeeStock(string $transactId, int $qty): bool
+    {
         return true;
     }
 
@@ -159,50 +166,50 @@ class StocksController extends Controller
     }
 
 
-    function getAccessToken() {
-            $host = "https://partner.shopeemobile.com";
-            $path = "/api/v2/auth/token/get";
+    function getAccessToken()
+    {
+        $host = "https://partner.shopeemobile.com";
+        $path = "/api/v2/auth/token/get";
 
-            $code = "4c644953694743467a56714d63625a51";
-            $shopId = "322049526";
-            $partnerId = "2010905";
-            $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
+        $code = "4c644953694743467a56714d63625a51";
+        $shopId = "322049526";
+        $partnerId = "2010905";
+        $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
 
-            // {
-            //     "refresh_token": "424e446b6e6c6d725443766961697764",
-            //     "access_token": "444d4f6b425770514a78626668477652",
-            //     "expire_in": 14258,
-            //     "request_id": "e3e3e7f3326413861e2351dcc9f24e00",
-            //     "error": "",
-            //     "message": ""
-            //}
+        // {
+        //     "refresh_token": "424e446b6e6c6d725443766961697764",
+        //     "access_token": "444d4f6b425770514a78626668477652",
+        //     "expire_in": 14258,
+        //     "request_id": "e3e3e7f3326413861e2351dcc9f24e00",
+        //     "error": "",
+        //     "message": ""
+        //}
 
-            // &shop_id=322049526
-            
-            $timest = time();
-            $body = array("code" => $code,  "shop_id" => $shopId, "partner_id" => $partnerId);
-            $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
-            $sign = hash_hmac('sha256', $baseString, $partnerKey);
-            $url = sprintf("%s%s?partner_id=%s&timestamp=%s&sign=%s", $host, $path, $partnerId, $timest, $sign);
+        // &shop_id=322049526
 
-            echo $url ;
+        $timest = time();
+        $body = array("code" => $code,  "shop_id" => $shopId, "partner_id" => $partnerId);
+        $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
+        $sign = hash_hmac('sha256', $baseString, $partnerKey);
+        $url = sprintf("%s%s?partner_id=%s&timestamp=%s&sign=%s", $host, $path, $partnerId, $timest, $sign);
 
-            echo json_encode($body) ;
-        
-            $c = curl_init($url);
-            curl_setopt($c, CURLOPT_POST, 1);
-            curl_setopt($c, CURLOPT_POSTFIELDS, json_encode($body));
-            curl_setopt($c, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-            $resp = curl_exec($c);
-            echo "raw result: $resp";
-        
-            $ret = json_decode($resp, true);
-            $accessToken = $ret["access_token"];
-            $newRefreshToken = $ret["refresh_token"];
-            echo "\naccess_token: $accessToken, refresh_token: $newRefreshToken raw: $ret"."\n";
-            return $ret;
-        
+        echo $url;
+
+        echo json_encode($body);
+
+        $c = curl_init($url);
+        curl_setopt($c, CURLOPT_POST, 1);
+        curl_setopt($c, CURLOPT_POSTFIELDS, json_encode($body));
+        curl_setopt($c, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        $resp = curl_exec($c);
+        echo "raw result: $resp";
+
+        $ret = json_decode($resp, true);
+        $accessToken = $ret["access_token"];
+        $newRefreshToken = $ret["refresh_token"];
+        echo "\naccess_token: $accessToken, refresh_token: $newRefreshToken raw: $ret" . "\n";
+        return $ret;
     }
 
     function getItemFromShopee()
@@ -213,7 +220,6 @@ class StocksController extends Controller
         //https: //intra.uratex.com.ph/?code=4575644f496d61556479566847556f6c&shop_id=322049526
         $shopID = '322049526';
         $code = '4575644f496d61556479566847556f6c';
-
 
 
         // {"shop_id":38862,
@@ -230,7 +236,7 @@ class StocksController extends Controller
 
 
         $timest = time();
-        $baseString = sprintf("%s%s%s%s%s", $partnerID, $path, $timest, $access_token, $shopID );
+        $baseString = sprintf("%s%s%s%s%s", $partnerID, $path, $timest, $access_token, $shopID);
         $sign = hash_hmac('sha256', $baseString, $partnerKey);
 
 
@@ -270,6 +276,6 @@ class StocksController extends Controller
         // $request->addApiParam('uuid', 'This field is currently invalid,  do not use this field please');
         var_dump($c->execute($request));
 
-        print_r("sfsf " ) ;
+        print_r("sfsf ");
     }
 }
