@@ -10,6 +10,10 @@ use PDO;
 use Firebase\JWT\Key;
 use InvalidArgumentException;
 use Exception;
+use stockalignment\Controller\StocksController;
+
+session_start();
+
 
 class AuthenticationController extends Controller
 {
@@ -354,13 +358,42 @@ class AuthenticationController extends Controller
 
     public function userAuthenticate()
     {
+        $jsonData = file_get_contents('php://input');
+        $data = json_decode($jsonData, true);
 
-        $dbPDO = new Database();
-        $email = $_POST['email'] ?? "";
-        $password = $_POST['password'] ?? "";
+        $email = $data['InputEmail'] ?? "";
+        $password = $data['InputPassword'] ?? "";
+
+        $message = "";
+
+        $pdo = $this->database->getPdo();
 
 
-        $Sql = "SELECT api_role FROM stocksapi_creds WHERE api_emailadd = '" . $email . "'";
-        $this->database->getPdo();
+        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password FROM StockAlignUsers WHERE username = :username");
+        $stmt->bindParam(':username', $email);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            $stored_hash = $user['password'];
+
+            if (password_verify($password, $stored_hash)) {
+                // Process $results
+                $_SESSION["userno"] = $email;
+                $response = ['status' => 'success', 'message' => 'Login successful'];
+                header('Content-Type: application/json');
+                echo json_encode($response);
+                exit;
+            } else {
+                // Password does not match.
+                $message = "Invalid password.";
+                $status = "error";
+            }
+        } else {
+            $message = "Email Address not found";
+            $status = "error";
+        }
+
+        echo json_encode(["message" => $message, "status" => $status]);
     }
 }

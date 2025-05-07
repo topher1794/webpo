@@ -27,12 +27,12 @@ class StocksController extends Controller
         $this->database = Database::getInstance();
     }
 
-    public function dashboard(){
+    public function dashboard()
+    {
         $data['logs'] = $_POST;
         $this->render('Template/header.php', $data);
         $this->render('Dashboard/dashboard.php', $data);
         $this->render('Template/footer.php', $data);
-
     }
 
     public function getStocks()
@@ -65,50 +65,50 @@ class StocksController extends Controller
     }
 
 
-    function getAccessToken() {
-            $host = "https://partner.shopeemobile.com";
-            $path = "/api/v2/auth/token/get";
+    function getAccessToken()
+    {
+        $host = "https://partner.shopeemobile.com";
+        $path = "/api/v2/auth/token/get";
 
-            $code = "4c644953694743467a56714d63625a51";
-            $shopId = "322049526";
-            $partnerId = "2010905";
-            $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
+        $code = "4c644953694743467a56714d63625a51";
+        $shopId = "322049526";
+        $partnerId = "2010905";
+        $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
 
-            // {
-            //     "refresh_token": "424e446b6e6c6d725443766961697764",
-            //     "access_token": "444d4f6b425770514a78626668477652",
-            //     "expire_in": 14258,
-            //     "request_id": "e3e3e7f3326413861e2351dcc9f24e00",
-            //     "error": "",
-            //     "message": ""
-            //}
+        // {
+        //     "refresh_token": "424e446b6e6c6d725443766961697764",
+        //     "access_token": "444d4f6b425770514a78626668477652",
+        //     "expire_in": 14258,
+        //     "request_id": "e3e3e7f3326413861e2351dcc9f24e00",
+        //     "error": "",
+        //     "message": ""
+        //}
 
-            // &shop_id=322049526
-            
-            $timest = time();
-            $body = array("code" => $code,  "shop_id" => $shopId, "partner_id" => $partnerId);
-            $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
-            $sign = hash_hmac('sha256', $baseString, $partnerKey);
-            $url = sprintf("%s%s?partner_id=%s&timestamp=%s&sign=%s", $host, $path, $partnerId, $timest, $sign);
+        // &shop_id=322049526
 
-            echo $url ;
+        $timest = time();
+        $body = array("code" => $code,  "shop_id" => $shopId, "partner_id" => $partnerId);
+        $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
+        $sign = hash_hmac('sha256', $baseString, $partnerKey);
+        $url = sprintf("%s%s?partner_id=%s&timestamp=%s&sign=%s", $host, $path, $partnerId, $timest, $sign);
 
-            echo json_encode($body) ;
-        
-            $c = curl_init($url);
-            curl_setopt($c, CURLOPT_POST, 1);
-            curl_setopt($c, CURLOPT_POSTFIELDS, json_encode($body));
-            curl_setopt($c, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-            $resp = curl_exec($c);
-            echo "raw result: $resp";
-        
-            $ret = json_decode($resp, true);
-            $accessToken = $ret["access_token"];
-            $newRefreshToken = $ret["refresh_token"];
-            echo "\naccess_token: $accessToken, refresh_token: $newRefreshToken raw: $ret"."\n";
-            return $ret;
-        
+        echo $url;
+
+        echo json_encode($body);
+
+        $c = curl_init($url);
+        curl_setopt($c, CURLOPT_POST, 1);
+        curl_setopt($c, CURLOPT_POSTFIELDS, json_encode($body));
+        curl_setopt($c, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        $resp = curl_exec($c);
+        echo "raw result: $resp";
+
+        $ret = json_decode($resp, true);
+        $accessToken = $ret["access_token"];
+        $newRefreshToken = $ret["refresh_token"];
+        echo "\naccess_token: $accessToken, refresh_token: $newRefreshToken raw: $ret" . "\n";
+        return $ret;
     }
 
     function getItemFromShopee()
@@ -136,7 +136,7 @@ class StocksController extends Controller
 
 
         $timest = time();
-        $baseString = sprintf("%s%s%s%s%s", $partnerID, $path, $timest, $access_token, $shopID );
+        $baseString = sprintf("%s%s%s%s%s", $partnerID, $path, $timest, $access_token, $shopID);
         $sign = hash_hmac('sha256', $baseString, $partnerKey);
 
 
@@ -176,6 +176,6 @@ class StocksController extends Controller
         // $request->addApiParam('uuid', 'This field is currently invalid,  do not use this field please');
         var_dump($c->execute($request));
 
-        print_r("sfsf " ) ;
+        print_r("sfsf ");
     }
 }
