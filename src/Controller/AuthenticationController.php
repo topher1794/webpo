@@ -40,8 +40,8 @@ class AuthenticationController extends Controller
         $data['title'] = "LOGIN";
         $haveSession = $_SESSION["userno"] ?? "";
         if (!empty($haveSession)) {
-            // $controller = new AuthenticationController();
-            $this->dashboard();
+            $stkController = new StocksController();
+            $stkController->dashboard();
             exit();
         }
         $this->render('Login/login.php', $data);

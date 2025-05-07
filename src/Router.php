@@ -74,8 +74,10 @@ class Router
                 "getAccessTokenLazada",
                 "registration",
                 "newRegistration",
-                "dashboard",
+                // "dashboard",
                 "syncviaform",
+                "logOut",
+
 
 
             );
