@@ -35,7 +35,7 @@ $router->get('/dashboard', stockalignment\Controller\StocksController::class, 'd
 
 $router->post('/syncviaform', stockalignment\Controller\StocksController::class, 'syncviaform');
 
-
+$router->get('/newsync', stockalignment\Controller\StocksController::class, 'newsync');
 
 
 $router->dispatch();
