@@ -153,38 +153,31 @@
 										<a href="tel:(02)88886800"><i class="fa fa-phone"> Contact Us </i></a>
 									</div>
 								</div>
-								<<<<<<< HEAD
-									</div>
+
+								<div class="errormessage" id="errormessage">
+									<strong> </strong>
+								</div>
+								<input type="submit" value="Login" class="btn btn-primary btn-user btn-block" style="font-size:15px; padding:5px; font-weight:bold" />
+								<hr>
 							</div>
+
+							</form>
+
+							<hr>
+							<div class="text-center">
+
+							</div>
+
 						</div>
+
 					</div>
-					=======
 
-					<div class="errormessage" id="errormessage">
-						<strong> </strong>
-					</div>
-					<input type="submit" value="Login" class="btn btn-primary btn-user btn-block" style="font-size:15px; padding:5px; font-weight:bold" />
-					<hr>
-				</div>
-
-				</form>
-
-				<hr>
-				<div class="text-center">
-					>>>>>>> 148a20d88f2270c4c4304a21d10da615738a1e34
-
-				</div>
-
-			</div>
-
-		</div>
-
-		<!-- jQuery -->
-		<script src="Assets/plugins/jquery/jquery.min.js"></script>
-		<!-- Bootstrap 4 -->
-		<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-		<!-- AdminLTE App -->
-		<script src="Assets/dist/js/adminlte.min.js"></script>
+					<!-- jQuery -->
+					<script src="Assets/plugins/jquery/jquery.min.js"></script>
+					<!-- Bootstrap 4 -->
+					<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+					<!-- AdminLTE App -->
+					<script src="Assets/dist/js/adminlte.min.js"></script>
 
 </body>
 
