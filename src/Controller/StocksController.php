@@ -17,6 +17,7 @@ use Exception;
 
 use stockalignment\Classes\SAP;
 
+
 class StocksController extends Controller
 {
 
@@ -26,13 +27,106 @@ class StocksController extends Controller
     {
         $this->database = Database::getInstance();
     }
+    
 
     public function dashboard()
     {
         $data['logs'] = $_POST;
         $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
         $this->render('Dashboard/dashboard.php', $data);
         $this->render('Template/footer.php', $data);
+    }
+
+
+    public function syncapi(){
+         // get Bearer
+
+         if(array_key_exists("Authorization", getallheaders())) {
+
+            if(strpos( getallheaders()["Authorization"], "Bearer" ) === FALSE) {
+                http_response_code(400);
+                echo json_encode(["message" => "Bearer is required."]);
+                exit();
+            }
+        }else{
+            http_response_code(400);
+            echo json_encode(["message" => "Authentication is required."]);
+            exit();
+        }
+
+        $bearerToken = getallheaders()["Authorization"] ??"";
+        $bearerToken = str_replace("Bearer ","", $bearerToken);
+    }
+
+    public function syncviaform(){
+        
+        $userid = $_POST["userid"] ??"";
+        $empname = $_POST["empname"] ??"";
+        $qty = $_POST["qty"] ??"";
+
+        $data = array(
+                "userid" => $userid 
+                ,"empname" => $empname
+                ,"qty" => $qty
+        );
+
+        print_r($_POST);
+
+        // $this->syncStock($data) ;
+    }
+
+
+
+    public function syncStock(array $data){
+
+        $pdo = $this->database->getPdo();
+
+        /**
+         * 
+         * get user id who requested the sync and empname
+         * 
+        */
+
+        $userid = $data["userid"];
+        $empname = $data["empname"];
+        $source = $data["source"];
+
+        /**
+         * get stocks from SAP
+         * 
+        */
+
+        $sqlSettings = "SELECT attributez  FROM StockAlignSettings where settingstype =:settingstype";
+        $statement = $pdo->prepare($sqlSettings);
+        $statement->bindParam(":settingstype", "SAP", PDO::PARAM_STR);
+        $statement->execute();
+        $settingsInfo = $statement->fetch(PDO::FETCH_ASSOC);
+
+        print_r($settingsInfo);
+
+        exit(); 
+         /**
+          * Allocation 60/40 round up
+          */
+
+        //   call syncEcomStock
+
+
+
+    }
+
+    public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool {
+
+        return true;
+    }
+
+    public function syncLazadaStock(string $transactId, int $qty): bool {
+        return true;
+    }
+
+    public function syncShopeeStock(string $transactId, int $qty): bool {
+        return true;
     }
 
     public function getStocks()
