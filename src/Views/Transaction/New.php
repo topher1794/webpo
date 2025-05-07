@@ -18,7 +18,7 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Material Code</label>
-                                    <input name="materialcode" id="materialcode" type="date" class="form-control form-control-border border-width-2" />
+                                    <input name="materialcode" id="materialcode" type="text" class="form-control form-control-border border-width-2" />
                                 </div>
                                
                             </div>
