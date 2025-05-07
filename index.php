@@ -5,6 +5,9 @@ use stockalignment\Router;
 require_once realpath("vendor/autoload.php");
 
 
+error_reporting(0);
+
+ob_start();
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
