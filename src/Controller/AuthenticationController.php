@@ -396,4 +396,10 @@ class AuthenticationController extends Controller
 
         echo json_encode(["message" => $message, "status" => $status]);
     }
+
+    public function logOut()
+    {
+        session_destroy();
+        $this->render('Login/login.php');
+    }
 }

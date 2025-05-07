@@ -77,7 +77,7 @@ class Router
                 "dashboard",
                 "syncviaform",
 
-                
+
             );
             // print_r($uri);
             // exit();
@@ -93,10 +93,10 @@ class Router
 
             try {
                 $model = null;
-                switch($linkUrl) {
-                    case "registration" :
-                    case "newRegistration" :
-                        $model = new UserModel( $pdo);
+                switch ($linkUrl) {
+                    case "registration":
+                    case "newRegistration":
+                        $model = new UserModel($pdo);
                         break;
                     default:
                         $model = null;

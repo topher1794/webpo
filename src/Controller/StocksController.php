@@ -14,6 +14,7 @@ use PDO;
 use Firebase\JWT\Key;
 use InvalidArgumentException;
 use Exception;
+use stockalignment\Controller\AuthenticationController;
 
 use stockalignment\Classes\SAP;
 
@@ -27,7 +28,7 @@ class StocksController extends Controller
     {
         $this->database = Database::getInstance();
     }
-    
+
 
     public function dashboard()
     {
@@ -39,36 +40,38 @@ class StocksController extends Controller
     }
 
 
-    public function syncapi(){
-         // get Bearer
+    public function syncapi()
+    {
+        // get Bearer
 
-         if(array_key_exists("Authorization", getallheaders())) {
+        if (array_key_exists("Authorization", getallheaders())) {
 
-            if(strpos( getallheaders()["Authorization"], "Bearer" ) === FALSE) {
+            if (strpos(getallheaders()["Authorization"], "Bearer") === FALSE) {
                 http_response_code(400);
                 echo json_encode(["message" => "Bearer is required."]);
                 exit();
             }
-        }else{
+        } else {
             http_response_code(400);
             echo json_encode(["message" => "Authentication is required."]);
             exit();
         }
 
-        $bearerToken = getallheaders()["Authorization"] ??"";
-        $bearerToken = str_replace("Bearer ","", $bearerToken);
+        $bearerToken = getallheaders()["Authorization"] ?? "";
+        $bearerToken = str_replace("Bearer ", "", $bearerToken);
     }
 
-    public function syncviaform(){
-        
-        $userid = $_POST["userid"] ??"";
-        $empname = $_POST["empname"] ??"";
-        $qty = $_POST["qty"] ??"";
+    public function syncviaform()
+    {
+
+        $userid = $_POST["userid"] ?? "";
+        $empname = $_POST["empname"] ?? "";
+        $qty = $_POST["qty"] ?? "";
 
         $data = array(
-                "userid" => $userid 
-                ,"empname" => $empname
-                ,"qty" => $qty
+            "userid" => $userid,
+            "empname" => $empname,
+            "qty" => $qty
         );
 
         print_r($_POST);
@@ -78,7 +81,8 @@ class StocksController extends Controller
 
 
 
-    public function syncStock(array $data){
+    public function syncStock(array $data)
+    {
 
         $pdo = $this->database->getPdo();
 
@@ -86,7 +90,7 @@ class StocksController extends Controller
          * 
          * get user id who requested the sync and empname
          * 
-        */
+         */
 
         $userid = $data["userid"];
         $empname = $data["empname"];
@@ -95,7 +99,7 @@ class StocksController extends Controller
         /**
          * get stocks from SAP
          * 
-        */
+         */
 
         $sqlSettings = "SELECT attributez  FROM StockAlignSettings where settingstype =:settingstype";
         $statement = $pdo->prepare($sqlSettings);
@@ -105,10 +109,10 @@ class StocksController extends Controller
 
         print_r($settingsInfo);
 
-        exit(); 
-         /**
-          * Allocation 60/40 round up
-          */
+        exit();
+        /**
+         * Allocation 60/40 round up
+         */
 
         //   call syncEcomStock
 
@@ -116,16 +120,19 @@ class StocksController extends Controller
 
     }
 
-    public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool {
+    public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
+    {
 
         return true;
     }
 
-    public function syncLazadaStock(string $transactId, int $qty): bool {
+    public function syncLazadaStock(string $transactId, int $qty): bool
+    {
         return true;
     }
 
-    public function syncShopeeStock(string $transactId, int $qty): bool {
+    public function syncShopeeStock(string $transactId, int $qty): bool
+    {
         return true;
     }
 
@@ -213,7 +220,6 @@ class StocksController extends Controller
         //https: //intra.uratex.com.ph/?code=4575644f496d61556479566847556f6c&shop_id=322049526
         $shopID = '322049526';
         $code = '4575644f496d61556479566847556f6c';
-
 
 
         // {"shop_id":38862,
