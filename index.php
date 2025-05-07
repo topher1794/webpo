@@ -27,6 +27,13 @@ $router->post('/newRegistration', stockalignment\Controller\RegistrationControll
 $router->get('/dashboard', stockalignment\Controller\StocksController::class, 'dashboard');
 
 
+/**
+ * SYNCHING ACTION
+ */
+
+$router->post('/syncviaform', stockalignment\Controller\StocksController::class, 'syncviaform');
+
+
 
 
 $router->dispatch();

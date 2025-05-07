@@ -75,6 +75,7 @@ class Router
                 "registration",
                 "newRegistration",
                 "dashboard",
+                "syncviaform",
 
                 
             );

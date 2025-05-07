@@ -44,15 +44,15 @@ class SAP {
      * 
      */
 
-    public function getSAPToken(String $SAPIP, String $SAPPort, String $sapodsrv, String $sapeset): array
+    public function getSAPToken(String $http, String $username, String $password, String $SAPIP, String $SAPPort, String $sapodsrv, String $sapeset): array
     {
 
         $serverloc = explode("/", ($_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']));
 
         $SAPPort = "";
-        $SAPPtl = 'http';
-        $SAPUser = "mis_api";
-        $SAPPass = "ur@t3x";
+        $SAPPtl = $http;
+        $SAPUser = $username;
+        $SAPPass = $password;
         $SAPIP = "";
        
         $SAPClient = "888";
