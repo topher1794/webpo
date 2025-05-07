@@ -39,6 +39,16 @@ class StocksController extends Controller
         $this->render('Template/footer.php', $data);
     }
 
+    
+    public function newsync()
+    {
+        $data['logs'] = $_POST;
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Transaction/New.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
+
 
     public function syncapi()
     {
