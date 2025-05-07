@@ -1,0 +1,56 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox
+input[type=number] {
+  -moz-appearance: textfield;
+} */
+
+
+
+div.submitform {
+  padding-top: 10px; 
+  padding-right: 20px;
+  text-align: right;
+}
+
+button.submitform {
+  border-radius: 4px;
+  background-color: #18a4bc;
+  color: white;
+  padding: 10px;
+  outline: none;
+  border: none;
+}
+
+td.partwo {
+  padding-top: 20px;
+  padding-bottom: 0;
+  text-align: center;
+}
+
+thead.tab {
+    background-color: #e9ecef;
+    border-top: 1px solid #e0e4e4;
+    border-bottom: 1px solid #e0e4e4;
+}
+div.bord {
+  background-color: #f4f6f9; 
+  padding: 0; 
+}
+
+input.part {
+  border: 1px solid darkgray;
+  background-color: white;
+}
+
+select.part {
+  border: 1px solid darkgray;
+  background-color: white;
+}
+
+
+

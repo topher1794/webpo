@@ -1,72 +1,179 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<meta name="description" content="This is a login page template based on Bootstrap 5">
-	<title>Bootstrap 5 Login Page</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+	  <meta name="mobile-web-app-capable" content="yes">
+	  <meta charset="utf-8">
+	  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <meta name="description" content="">
+	  <meta name="author" content="">
+
+	  <meta name="google-signin-scope" content="profile email">
+	  <meta name="google-signin-client_id" content="975215138073-q01j0lkacgag3t9sfmb91qltkjk6efne.apps.googleusercontent.com">
+	  <!--<meta name="google-signin-client_id" content="146152365447-7qrk3j0bap218qgj39gpa3taqrmct7ek.apps.googleusercontent.com">-->
+	  
+  
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+	
+  <title><?php //echo $servername;?></title>
+  <link rel="icon" type="image/png" href="">
+
+  <link rel="stylesheet" href="Assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="Assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="Assets/dist/css/adminlte.min.css">
+
+<style type="text/css">
+.errormessage {
+	color: #F00;
+}
+
+.bg-image { 
+  /* Add the blur effect */
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+  
+  /* Full height */
+  height: 100%; 
+  
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+div.blur{
+
+	background: rgba(255,255,255,0.1);
+-webkit-backdrop-filter: blur(24px);
+backdrop-filter: blur(24px);
+border: 1px solid rgba(255,255,255,0.05);
+
+}
+
+
+.dt-buttons button {
+  border-radius: 4px;
+  background-color: #18a4bc;
+  color: white;
+  padding: 7px 15px 7px 15px ;
+  cursor: pointer;
+  border: 2px solid #f8f4fc;
+  
+  
+}
+
+.dt-buttons button:hover {
+  background-color: #0f8fa5;
+  border: 2px solid #f8f4fc;
+}
+
+.dt-buttons button:active {
+  background-color: #028aa2;
+  border: 2px solid #f8f4fc;
+}
+
+
+</style>
+
 </head>
 
-<body>
-	<section class="h-100">
-		<div class="container h-100">
-			<div class="row justify-content-sm-center h-100">
-				<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
-					<div class="text-center my-5">
-						<img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="logo" width="100">
-					</div>
-					<div class="card shadow-lg">
-						<div class="card-body p-5">
-							<h1 class="fs-4 card-title fw-bold mb-4">Login</h1>
-							<form method="POST" class="needs-validation" novalidate="" autocomplete="off">
-								<div class="mb-3">
-									<label class="mb-2 text-muted" for="email">E-Mail Address</label>
-									<input id="email" type="email" class="form-control" name="email" value="" required autofocus>
-									<div class="invalid-feedback">
-										Email is invalid
-									</div>
-								</div>
+<body class="bg-gradient-primarys" background="" style="background-position:center; background-repeat:no-repeat; background-size: cover;">
 
-								<div class="mb-3">
-									<div class="mb-2 w-100">
-										<label class="text-muted" for="password">Password</label>
-										<a href="forgot.html" class="float-end">
-											Forgot Password?
-										</a>
-									</div>
-									<input id="password" type="password" class="form-control" name="password" required>
-								    <div class="invalid-feedback">
-								    	Password is required
-							    	</div>
-								</div>
+  <div class="container">
 
-								<div class="d-flex align-items-center">
-									<div class="form-check">
-										<input type="checkbox" name="remember" id="remember" class="form-check-input">
-										<label for="remember" class="form-check-label">Remember Me</label>
-									</div>
-									<button type="submit" class="btn btn-primary ms-auto">
-										Login
-									</button>
-								</div>
-							</form>
-						</div>
-						<div class="card-footer py-3 border-0">
-							<div class="text-center">
-								Don't have an account? <a href="registration" class="text-dark">Create One</a>
-							</div>
-						</div>
-					</div>
-					<div class="text-center mt-5 text-muted">
-						Copyright &copy; 2017-2021 &mdash; Your Company 
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
+    <!-- Outer Row -->
+    <div class="row justify-content-center">
 
-	<script src="js/login.js"></script>
+      <div class="col-xl-6 col-lg-12 col-md-9">
+
+        <div class="card o-hidden border-0 shadow-lg my-5 blur" style="min-height:80vh;">
+          <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div class="row">
+              <div class="col-lg-12" align="center">
+              	<div class="pl-5 pr-5 pt-3">
+                  <div class="text-center">	
+                    <img src="" width="50%" align="middle">
+                  </div>
+                  <hr>
+                  <div class="text-center">
+                    <h1 class="h4 mb-4 text-white"><strong><?php //echo $appname?></strong></h1>
+                  </div>
+                    
+                  <div class="form-group" id="profilepicdiv" style="display:none">	
+                    <img src="" width="40%" align="middle" id="profilepic" style="border-radius: 50%;">
+                  </div>
+                  
+                  <form action="<?php //echo $loginFormAction; ?>" class="user" id="login" method="POST">
+                        <div class="form-group" id="gsigninbtn">
+                                <div class="input-group mb-3">
+								  <input type="text" class="form-control" placeholder="User ID" id="InputEmail" name="InputEmail" required>
+								  <div class="input-group-append">
+									<div class="input-group-text">
+									  <span class="fas fa-user"></span>
+									</div>
+								  </div>
+								</div>
+								<div class="input-group mb-3">
+								  <input type="password" class="form-control" placeholder="Password" id="InputPassword" name="InputPassword" autocomplete="new-password" required>
+								  <div class="input-group-append">
+									<div class="input-group-text">
+									  <span class="fas fa-lock"></span>
+									</div>
+								  </div>
+								</div>
+                               
+                               
+                                    <div class="errormessage" id="errormessage">
+                                        <strong>  </strong>
+                                    </div>
+                                
+								
+                                
+                                <input type="submit" value="Login" class="btn btn-primary btn-user btn-block" style="font-size:15px; padding:5px; font-weight:bold"/>
+                                            
+                                <hr>
+                                
+							
+                        </div>
+                  
+                
+                  <input type="hidden" id="MM_googleindicator" name="MM_googleindicator" value="">
+                  <input type="hidden" id="MM_googleToken" name="MM_googleToken" value="">
+                  </form>
+                  
+                  <hr>
+                  <div class="text-center">
+
+                  	<a href="#"><button class="btn btn-info buttons-print" tabindex="0" aria-controls="example1" type="button"><span>Forgot Password?</span></button></a>
+					<!-- <br>
+					<a href="tel:(02)88886800"><i class="fa fa-phone"> Contact Us </i></a> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  
+<!-- jQuery -->
+<script src="Assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="Assets/dist/js/adminlte.min.js"></script>
+
 </body>
+
 </html>
+

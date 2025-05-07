@@ -1,0 +1,91 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
+}
+
+th, td {
+  text-align: center;
+  padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f8f4fc}
+
+th {
+  background-color: #b4bcc4;
+  color: black;
+ 
+}
+
+
+div.buttons {
+  padding: 10px;
+}
+
+button.submitform {
+  border-radius: 4px;
+  background-color: #18a4bc;
+  color: white;
+  padding: 10px;
+  outline: none;
+  border: none;
+  text-align: right;
+}
+
+button.addform {
+  border-radius: 4px;
+  background-color: #18bc57;
+  color: white;
+  padding: 10px;
+  outline: none;
+  border: none;
+  text-align: left;
+}
+
+button.del {
+  border-radius: 4px;
+  background-color: #c41711;
+  color: white;
+  padding: 10px;
+  outline: none;
+  border: none;
+}
+
+
+
+
+th.head {
+  background-color: #b4bcc4;
+  color: black;
+ 
+}
+
+
+
+
+
+
+
+
+.dt-buttons button {
+  border-radius: 4px;
+  background-color: #18a4bc;
+  color: white;
+  padding: 7px 15px 7px 15px ;
+  cursor: pointer;
+  border: 2px solid #f8f4fc;
+  
+  
+}
+
+.dt-buttons button:hover {
+  background-color: #0f8fa5;
+  border: 2px solid #f8f4fc;
+}
+
+.dt-buttons button:active {
+  background-color: #028aa2;
+  border: 2px solid #f8f4fc;
+}
+
+
