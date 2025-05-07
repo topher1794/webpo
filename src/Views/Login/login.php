@@ -109,7 +109,7 @@ border: 1px solid rgba(255,255,255,0.05);
                     <img src="" width="40%" align="middle" id="profilepic" style="border-radius: 50%;">
                   </div>
                   
-                  <form action="" class="user" id="login" method="POST">
+                  <form action="userAuthen" class="user" id="login" method="POST">
                         <div class="form-group" id="gsigninbtn">
                                 <div class="input-group mb-3">
 								  <input type="text" class="form-control" placeholder="User ID" id="InputEmail" name="InputEmail" required>
@@ -131,12 +131,8 @@ border: 1px solid rgba(255,255,255,0.05);
                                     <div class="errormessage" id="errormessage">
                                         <strong>  </strong>
                                     </div>
-                                
                                 <input type="submit" value="Login" class="btn btn-primary btn-user btn-block" style="font-size:15px; padding:5px; font-weight:bold"/>
-                                            
                                 <hr>
-                                
-							
                         </div>
                 
                   </form>

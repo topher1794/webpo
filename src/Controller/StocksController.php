@@ -30,6 +30,7 @@ class StocksController extends Controller
     public function dashboard(){
         $data['logs'] = $_POST;
         $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
         $this->render('Dashboard/dashboard.php', $data);
         $this->render('Template/footer.php', $data);
 
