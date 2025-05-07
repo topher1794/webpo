@@ -98,18 +98,18 @@ border: 1px solid rgba(255,255,255,0.05);
               <div class="col-lg-12" align="center">
               	<div class="pl-5 pr-5 pt-3">
                   <div class="text-center">	
-                    <img src="" width="50%" align="middle">
+				  <img src="Assets\assets\images\uratex-logo.png" width="50%" align="middle">
                   </div>
                   <hr>
                   <div class="text-center">
-                    <h1 class="h4 mb-4 text-white"><strong><?php //echo $appname?></strong></h1>
+                    <h1 class="h4 mb-4"><strong>Stock Alignment</strong></h1>
                   </div>
                     
                   <div class="form-group" id="profilepicdiv" style="display:none">	
                     <img src="" width="40%" align="middle" id="profilepic" style="border-radius: 50%;">
                   </div>
                   
-                  <form action="<?php //echo $loginFormAction; ?>" class="user" id="login" method="POST">
+                  <form action="" class="user" id="login" method="POST">
                         <div class="form-group" id="gsigninbtn">
                                 <div class="input-group mb-3">
 								  <input type="text" class="form-control" placeholder="User ID" id="InputEmail" name="InputEmail" required>
@@ -128,12 +128,9 @@ border: 1px solid rgba(255,255,255,0.05);
 								  </div>
 								</div>
                                
-                               
                                     <div class="errormessage" id="errormessage">
                                         <strong>  </strong>
                                     </div>
-                                
-								
                                 
                                 <input type="submit" value="Login" class="btn btn-primary btn-user btn-block" style="font-size:15px; padding:5px; font-weight:bold"/>
                                             
@@ -141,18 +138,15 @@ border: 1px solid rgba(255,255,255,0.05);
                                 
 							
                         </div>
-                  
                 
-                  <input type="hidden" id="MM_googleindicator" name="MM_googleindicator" value="">
-                  <input type="hidden" id="MM_googleToken" name="MM_googleToken" value="">
                   </form>
                   
                   <hr>
                   <div class="text-center">
 
                   	<a href="#"><button class="btn btn-info buttons-print" tabindex="0" aria-controls="example1" type="button"><span>Forgot Password?</span></button></a>
-					<!-- <br>
-					<a href="tel:(02)88886800"><i class="fa fa-phone"> Contact Us </i></a> -->
+					<br>
+					<a href="tel:(02)88886800"><i class="fa fa-phone"> Contact Us </i></a>
                   </div>
                 </div>
               </div>
