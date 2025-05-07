@@ -74,7 +74,6 @@ class Router
                 "getAccessTokenLazada",
                 "registration",
                 "newRegistration",
-                // "dashboard",
                 "syncviaform",
                 "logOut",
 
@@ -85,8 +84,11 @@ class Router
             // exit();
             $linkUrl = $arrayUri[1];
             if (!in_array($linkUrl, $skipSession)) {
-                if (empty($_SESSION["userno"])) {
+                // print_r($_SESSION["userno"]) ;
+                //     echo "sssss";
+                //     exit();
 
+                if (empty($_SESSION["userno"])) {
                     $AuthenticationController = new AuthenticationController();
                     $AuthenticationController->index();
                     exit();
@@ -103,6 +105,8 @@ class Router
                     default:
                         $model = null;
                 }
+                // echo "hhhhh";
+                // exit();
                 $controller = new $controller($model);
                 $controller->$action();
             } catch (Exception $e) {
