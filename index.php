@@ -19,7 +19,7 @@ $router = new Router();
  */
 $router->get('/', stockalignment\Controller\AuthenticationController::class, 'index');
 $router->get('/login', stockalignment\Controller\AuthenticationController::class, 'index');
-$router->get('/logOut', stockalignment\Controller\AuthenticationController::class, 'logOut');
+$router->get('/Logout', stockalignment\Controller\AuthenticationController::class, 'logOut');
 
 
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');

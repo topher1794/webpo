@@ -75,7 +75,7 @@ class Router
                 "registration",
                 "newRegistration",
                 "syncviaform",
-                "logOut",
+                "Logout",
 
 
 

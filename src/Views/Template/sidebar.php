@@ -93,7 +93,7 @@
         </li>
 
         <li class="nav-item" id="li-dashboard">
-          <a href="logOut" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+          <a href="Logout" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
             <i class="fas fa-power-off"></i>
             <p>
               Logout
