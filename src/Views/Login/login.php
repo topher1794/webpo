@@ -110,8 +110,12 @@
 									</div>
 
 									<div class="alert alert-danger" role="alert">
-										A simple danger alert—check it out!
+										<i class="fas fa-exclamation-triangle" style="color: #F2F3F4;"></i> <span class="alert-text">A simple danger alert—check it out! </span>
 									</div>
+
+									<!-- <div class="alert alert-danger" role="alert">
+
+									</div> -->
 
 									<form class="user" id="loginFrm" method="POST">
 										<div class="form-group" id="gsigninbtn">
@@ -158,13 +162,23 @@
 							</div>
 
 						</div>
+					</div>
+					<div class="card-footer py-3 border-0">
+						<div class="text-center">
+							Don't have account? <a href="registration">Create an account</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-						<!-- jQuery -->
-						<script src="Assets/plugins/jquery/jquery.min.js"></script>
-						<!-- Bootstrap 4 -->
-						<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-						<!-- AdminLTE App -->
-						<script src="Assets/dist/js/adminlte.min.js"></script>
+	<!-- jQuery -->
+	<script src="Assets/plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="Assets/dist/js/adminlte.min.js"></script>
 
 </body>
 

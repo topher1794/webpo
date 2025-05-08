@@ -76,7 +76,7 @@ class Router
                 "newRegistration",
                 // "dashboard",
                 "syncviaform",
-                "logOut",
+                "Logout",
 
 
 

@@ -22,37 +22,41 @@ class RegistrationController extends Controller
         $this->render('Login/register.php', $data);
     }
 
-    public function newRegistration() {
-        $username = $_POST["username"] ?? "";
-        $email = $_POST["email"] ?? "";
-        $password = $_POST["password"] ?? "";
-        $confirmpassword = $_POST["confirm-password"] ?? "";   
-        echo json_encode($this->register($username, $email, $password, $confirmpassword), JSON_PRETTY_PRINT );
+    public function newRegistration()
+    {
+
+        $jsonData = file_get_contents('php://input');
+        $dataDecoded = json_decode($jsonData, true);
+
+        $username = $dataDecoded["username"] ?? "";
+        $email = $dataDecoded["email"] ?? "";
+        $password = $dataDecoded["password"] ?? "";
+        $confirmpassword = $dataDecoded["confirm-password"] ?? "";
+
+        echo json_encode($this->register($username, $email, $password, $confirmpassword), JSON_PRETTY_PRINT);
     }
 
     public function register(string $username, string $email, string $password, string $newPassword): array
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['status' => 400, 'message' => 'Invalid email format'];
+            return ['status' => 400, 'message' => 'Invalid email format!'];
         }
 
         if (strlen($password) < 6) {
-            return ['status' => 400, 'message' => 'Password too short'];
+            return ['status' => 400, 'message' => 'Password too shor!t'];
         }
 
         if ($this->userModel->emailExists($email)) {
-            return ['status' => 409, 'message' => 'Email already registered'];
+            return ['status' => 409, 'message' => 'Email already registered!'];
         }
 
-        if($password != $newPassword){
-            return ['status' => 400, 'message' => 'Password is not the same'];
+        if ($password != $newPassword) {
+            return ['status' => 400, 'message' => 'Password is not the same!'];
         }
 
         $hash = password_hash($password, PASSWORD_BCRYPT);
         $this->userModel->createUser($username, $email, $hash);
-        
+
         return ['status' => 201, 'message' => 'User registered'];
     }
-
-
 }
