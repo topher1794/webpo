@@ -39,13 +39,13 @@
           </a>
           <ul class="nav nav-treeview" style="border: 1px solid black; padding: -5px; border-radius: 5px;">
             <li class="nav-item">
-              <a href="stocktransaction?status=Open" class="nav-link" onclick="menuclick(this.id)" id="a-request-1">
+              <a href="transactionlogs?status=Open" class="nav-link" onclick="menuclick(this.id)" id="a-request-1">
                 <i class="fa fa-file nav-icon" aria-hidden="true"></i>
                 <p>Open</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="stocktransaction?status=Closed" class="nav-link" onclick="menuclick(this.id)" id="a-request-2">
+              <a href="transactionlogs?status=Closed" class="nav-link" onclick="menuclick(this.id)" id="a-request-2">
                 <i class="fa fa-user nav-icon" aria-hidden="true"></i>
                 <p>Closed</p>
               </a>
