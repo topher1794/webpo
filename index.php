@@ -5,6 +5,13 @@ use stockalignment\Router;
 require_once realpath("vendor/autoload.php");
 
 
+error_reporting(0);
+
+ob_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 $router = new Router();
 
 /**
@@ -35,7 +42,17 @@ $router->get('/dashboard', stockalignment\Controller\StocksController::class, 'd
 
 $router->post('/syncviaform', stockalignment\Controller\StocksController::class, 'syncviaform');
 
+$router->get('/newsync', stockalignment\Controller\StocksController::class, 'newsync');
 
 
 
+/**
+ * Stock Transaction
+ */
+$router->get('/transactionlogs', stockalignment\Controller\StocksController::class, 'transactionlogs');
+$router->post('/stocktransaction', stockalignment\Controller\StocksController::class, 'stocktransaction');
+
+
+
+ 
 $router->dispatch();

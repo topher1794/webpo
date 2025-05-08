@@ -39,6 +39,8 @@ class AuthenticationController extends Controller
     {
         $data['title'] = "LOGIN";
         $haveSession = $_SESSION["userno"] ?? "";
+        // echo $haveSession;
+        // exit();
         if (!empty($haveSession)) {
             $stkController = new StocksController();
             $stkController->dashboard();

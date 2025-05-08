@@ -14,6 +14,7 @@ use PDO;
 use Firebase\JWT\Key;
 use InvalidArgumentException;
 use Exception;
+use PhpParser\Node\Stmt\Echo_;
 use stockalignment\Controller\AuthenticationController;
 
 use stockalignment\Classes\SAP;
@@ -36,6 +37,33 @@ class StocksController extends Controller
         $this->render('Template/header.php', $data);
         $this->render('Template/sidebar.php', $data);
         $this->render('Dashboard/dashboard.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
+
+    
+    public function transactionlogs()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "stocks";
+        $data['action'] = "logs";
+
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Transaction/Lists.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
+
+    
+    public function newsync()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "stocks";
+        $data['action'] = "newsync";
+
+
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Transaction/New.php', $data);
         $this->render('Template/footer.php', $data);
     }
 
@@ -64,19 +92,58 @@ class StocksController extends Controller
     public function syncviaform()
     {
 
-        $userid = $_POST["userid"] ?? "";
-        $empname = $_POST["empname"] ?? "";
-        $qty = $_POST["qty"] ?? "";
+
+        $materialcode = $_POST["materialcode"] ?? "";
+        $userid = $_SESSION["userno"];
+        $empname = $_SESSION["empname"];
+
+
+        // $userid = $_POST["userno"] ?? "";
+        // $empname = $_POST["empname"] ?? "";
+        // $qty = $_POST["qty"] ?? "";
+
+        
+
+
+        $stockQty = $this->getStocks($materialcode);
+
+        if(empty($stockQty)){
+            echo json_encode(array("result"=> "error", "message" => "Material code not found"));
+            exit();
+        }
+
+        $stockArr = explode("<br>", $stockQty);
+        $sQty = 0.0;
+        foreach($stockArr as $arr){
+            $arrData = explode("|", $arr);
+            $qty = $arrData[2];
+            $qty = trim($qty);
+            $sQty += (double) $qty;
+        }
+        if(empty($stockQty)){
+            echo json_encode(array("result"=> "error", "message" => "No quantity found"));
+            exit();
+        }
+
+
+        $shopeeQty = $sQty * .60;
+        $shopeeQty =  ceil($shopeeQty);
+        $lazadaQty =  $sQty - $shopeeQty;
+        $lazadaQty =  ceil($lazadaQty);
+
+
 
         $data = array(
             "userid" => $userid,
             "empname" => $empname,
-            "qty" => $qty
+            "materialcode" => $materialcode,
+            "shopee" => $shopeeQty,
+            "lazada" => $lazadaQty,
         );
 
-        print_r($_POST);
+        $this->syncStock($data);
 
-        // $this->syncStock($data) ;
+
     }
 
 
@@ -95,26 +162,63 @@ class StocksController extends Controller
         $userid = $data["userid"];
         $empname = $data["empname"];
         $source = $data["source"];
+        $materialcode = $data["materialcode"];
+        $shopeeQty = $data["shopee"];
+        $lazadaQty = $data["lazada"];
 
         /**
-         * get stocks from SAP
-         * 
-         */
+         * insert into logs
+        */
+        $stmtUuid = $pdo->prepare("SELECT uuid() as uuid");
+        $stmtUuid->execute();
+        $uuid = $stmtUuid->fetch();
 
-        $sqlSettings = "SELECT attributez  FROM StockAlignSettings where settingstype =:settingstype";
-        $statement = $pdo->prepare($sqlSettings);
-        $statement->bindParam(":settingstype", "SAP", PDO::PARAM_STR);
-        $statement->execute();
-        $settingsInfo = $statement->fetch(PDO::FETCH_ASSOC);
+        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, userid, status)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? ) ";
+        $statement = $pdo->prepare($sql);
+        $statement->execute([$uuid["uuid"], $materialcode, $userid, "OPEN"]);
+        
 
-        print_r($settingsInfo);
+        $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND COALESCE(sku, parentsku) = ?");
+        $stmtShopee->execute([ $materialcode]);
+        $shopee = $stmtShopee->fetch();
+        
+        $shopeeID = $shopee["productid"];
 
-        exit();
-        /**
-         * Allocation 60/40 round up
-         */
+        if(!empty($shopeeID)) {
+             //shopee
+            $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus)VALUES(
+                ?, uuid(), ?, ?, ?, ?, ? ) ";
+                $statement = $pdo->prepare($sql);
+                $statement->execute([
+                    $uuid["uuid"]
+                    , $materialcode
+                    , "SHOPEE"
+                    , $shopeeID
+                    , $shopeeQty
+                    ,"OPEN"
+                ]);
+        }
 
-        //   call syncEcomStock
+        $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND COALESCE(sku, parentsku) = ?");
+        $stmtLazada->execute([ $materialcode]);
+        $lazada = $stmtLazada->fetch();
+
+        $lazadaID = $lazada["productid"];
+        
+        if(!empty($lazadaID)) {
+             //shopee
+            $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus)VALUES(
+                ?, uuid(), ?, ?, ?, ?, ? ) ";
+                $statement = $pdo->prepare($sql);
+                $statement->execute([
+                    $uuid["uuid"]
+                    , $materialcode
+                    , "LAZADA"
+                    , $lazadaID
+                    , $lazadaQty
+                    ,"OPEN"
+                ]);
+        }
 
 
 
@@ -136,13 +240,15 @@ class StocksController extends Controller
         return true;
     }
 
-    public function getStocks()
+    public function getStocks(string $materialcode)
     {
 
         // echo "ddd" ;
         // print_r($_GET);
 
-        $materialcode = $_GET["materialcode"];
+        if(empty($materialcode)) {
+            $materialcode = $_GET["materialcode"];
+        }
 
 
         $SAPPort =  $this->database->getSAPPort();
@@ -162,7 +268,35 @@ class StocksController extends Controller
         $sapData = $clsSAP->executeRFCToSAP($this->database->getSAPUser(), $this->database->getSAPPword(), $SAPUrl, $params);
         $sapReturn = $sapData["response"];
 
-        print_r($sapReturn);
+        return $sapReturn;
+    }
+
+
+    public function stocktransaction() {
+        $pdo = $this->database->getPdo();
+
+        
+        $draw = $_POST['draw'] ?? 1;
+        $start = $_POST['start'] ?? 1;
+        $length = $_POST['length'] ?? 1;
+
+        $sql = "SELECT transactno, syncno, accttype, materialcode, productid, qty, syncstatus, payload, response, synctime 
+        FROM 
+        StockAlignSync 
+        ";
+        $stmt = $pdo->query($sql );
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        $rowCount = count($data);
+        $json_data = array(
+          "draw"            =>  $draw,
+          "recordsTotal"    => intval($rowCount),
+          "recordsFiltered" => intval($rowCount),
+          "data"            => $data
+        );
+        echo json_encode($json_data, JSON_PRETTY_PRINT);
+    
     }
 
 

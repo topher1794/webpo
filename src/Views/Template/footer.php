@@ -1,18 +1,17 @@
-
 <footer class="main-footer sticky-bottom p-1">
-    <!-- <div class="float-right d-none d-sm-block">
+  <!-- <div class="float-right d-none d-sm-block">
       <b>Version</b> 2.0
     </div> -->
-	<div align="center">
-    	<strong>&copy; 2022 <a href="#">Stock Alignment Project</a>.</strong> All rights reserved.
-	</div>
-  </footer>
+  <div align="center">
+    <strong>&copy; 2022 <a href="#">Stock Alignment Project</a>.</strong> All rights reserved.
+  </div>
+</footer>
 
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  
+<!-- Control Sidebar -->
+<aside class="control-sidebar control-sidebar-dark">
+  <!-- Control sidebar content goes here -->
+</aside>
+
 </div>
 
 <!-- jQuery -->
@@ -62,5 +61,21 @@
 
 <!-- date-range-picker -->
 <script src="Assets/plugins/daterangepicker/daterangepicker.js"></script>
+
+
+<script type="module" src="Assets/js/ClsAsync.js"></script>
+
+
+<?php if (in_array($controller, array("stocks"))) { ?>
+  <?php if (in_array($action, array("newsync"))) { ?>
+    <script type="module"  src="Assets/js/New.js"></script>
+  <?php } ?>
+  <?php if (in_array($action, array("logs"))) { ?>
+    <script type="module"  src="Assets/js/TransactionList.js"></script>
+  <?php } ?>
+<?php } ?>
+
+
 </body>
+
 </html>
