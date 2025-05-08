@@ -65,7 +65,7 @@
 								</p>
 
 								<div class="align-items-center d-flex">
-									<button type="submit" class="btn btn-primary ms-auto">
+									<button type="submit" id="registerBtn" class="btn btn-primary ms-auto">
 										Register
 									</button>
 								</div>

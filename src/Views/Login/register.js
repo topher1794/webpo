@@ -48,13 +48,15 @@ $(document).on('keydown', '#password', (event) => {
     }
 
     if (keydownCount >= 6) {
-        $('#password').prop('style', 'border-color: green; box-shadow: green')
-        $('#passwordFeedBack').prop('hidden', true)
-        $('#confirm-password').prop('readonly', false)
+        $('#password').prop('style', 'border-color: green; box-shadow: green');
+        $('#passwordFeedBack').prop('hidden', true);
+        $('#confirm-password').prop('readonly', false);
+        $('#registerBtn').removeAttr('disabled');
     } else {
         $('#password').prop('style', 'border-color: red; ')
         $('#passwordFeedBack').removeAttr('hidden').text('password should have a minimum of 6 characters').prop('style', 'color: red; font-size: 0.700em');
-        $('#confirm-password').prop('readonly', true)
+        $('#confirm-password').prop('readonly', true);
+        $('#registerBtn').prop('disabled', true);
     }
 });
 
