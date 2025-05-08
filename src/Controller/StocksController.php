@@ -41,6 +41,19 @@ class StocksController extends Controller
     }
 
     
+    public function transactionlogs()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "stocks";
+        $data['action'] = "logs";
+
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Transaction/Lists.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
+
+    
     public function newsync()
     {
         $data['logs'] = $_POST;
@@ -256,6 +269,34 @@ class StocksController extends Controller
         $sapReturn = $sapData["response"];
 
         return $sapReturn;
+    }
+
+
+    public function stocktransaction() {
+        $pdo = $this->database->getPdo();
+
+        
+        $draw = $_POST['draw'] ?? 1;
+        $start = $_POST['start'] ?? 1;
+        $length = $_POST['length'] ?? 1;
+
+        $sql = "SELECT transactno, syncno, accttype, materialcode, productid, qty, syncstatus, payload, response, synctime 
+        FROM 
+        StockAlignSync 
+        ";
+        $stmt = $pdo->query($sql );
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        $rowCount = count($data);
+        $json_data = array(
+          "draw"            =>  $draw,
+          "recordsTotal"    => intval($rowCount),
+          "recordsFiltered" => intval($rowCount),
+          "data"            => $data
+        );
+        echo json_encode($json_data, JSON_PRETTY_PRINT);
+    
     }
 
 

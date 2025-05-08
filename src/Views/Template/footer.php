@@ -70,6 +70,9 @@
   <?php if (in_array($action, array("newsync"))) { ?>
     <script type="module"  src="Assets/js/New.js"></script>
   <?php } ?>
+  <?php if (in_array($action, array("logs"))) { ?>
+    <script type="module"  src="Assets/js/TransactionList.js"></script>
+  <?php } ?>
 <?php } ?>
 
 

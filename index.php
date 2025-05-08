@@ -45,4 +45,14 @@ $router->post('/syncviaform', stockalignment\Controller\StocksController::class,
 $router->get('/newsync', stockalignment\Controller\StocksController::class, 'newsync');
 
 
+
+/**
+ * Stock Transaction
+ */
+$router->get('/transactionlogs', stockalignment\Controller\StocksController::class, 'transactionlogs');
+$router->post('/stocktransaction', stockalignment\Controller\StocksController::class, 'stocktransaction');
+
+
+
+ 
 $router->dispatch();
