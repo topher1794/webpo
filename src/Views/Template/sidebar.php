@@ -33,27 +33,21 @@
           <a href="#" class="nav-link" id="lia-request" onclick="menuclick(this.id)">
             <i class="fa fa-list nav-icon" aria-hidden="true"></i>
             <p>
-              Transactions
+              Transaction Logs
               <i class="fas fa-angle-left right"></i>
             </p>
           </a>
           <ul class="nav nav-treeview" style="border: 1px solid black; padding: -5px; border-radius: 5px;">
             <li class="nav-item">
-              <a href="modulecontrol?Transaction&Transactions" class="nav-link" onclick="menuclick(this.id)" id="a-request-1">
+              <a href="" class="nav-link" onclick="menuclick(this.id)" id="a-request-1">
                 <i class="fa fa-file nav-icon" aria-hidden="true"></i>
-                <p>Recently Uploaded</p>
+                <p>Open</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="modulecontrol?Archive&Transactions" class="nav-link" onclick="menuclick(this.id)" id="a-request-2">
                 <i class="fa fa-user nav-icon" aria-hidden="true"></i>
-                <p>Archive</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="modulecontrol?Extract&Transactions" class="nav-link" onclick="menuclick(this.id)" id="a-request-3">
-                <i class="fa fa-download nav-icon" aria-hidden="true"></i>
-                Data
+                <p>Closed</p>
               </a>
             </li>
 

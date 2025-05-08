@@ -14,7 +14,7 @@
                             <h3 class="card-title">Sync Material Code</h3>
                         </div>
 
-                        <form action="" method="post" enctype="multipart/form-data" >
+                        <form id="frmData" action="" method="post" enctype="multipart/form-data" >
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Material Code</label>
@@ -24,7 +24,7 @@
                             </div>
 
                             <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" id="btnSubmit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -36,3 +36,4 @@
 
     </section>
 </div>
+
