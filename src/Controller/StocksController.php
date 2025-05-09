@@ -94,15 +94,9 @@ class StocksController extends Controller
 
 
         $materialcode = $_POST["materialcode"] ?? "";
+        $company = $_POST["company"] ??"";
         $userid = $_SESSION["userno"];
         $empname = $_SESSION["empname"];
-
-
-        // $userid = $_POST["userno"] ?? "";
-        // $empname = $_POST["empname"] ?? "";
-        // $qty = $_POST["qty"] ?? "";
-
-        
 
 
         $stockQty = $this->getStocks($materialcode);
@@ -137,6 +131,7 @@ class StocksController extends Controller
             "userid" => $userid,
             "empname" => $empname,
             "materialcode" => $materialcode,
+            "company" => $company,
             "shopee" => $shopeeQty,
             "lazada" => $lazadaQty,
         );
@@ -163,6 +158,7 @@ class StocksController extends Controller
         $empname = $data["empname"];
         $source = $data["source"];
         $materialcode = $data["materialcode"];
+        $company = $data["company"];
         $shopeeQty = $data["shopee"];
         $lazadaQty = $data["lazada"];
 
@@ -173,13 +169,13 @@ class StocksController extends Controller
         $stmtUuid->execute();
         $uuid = $stmtUuid->fetch();
 
-        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, userid, status)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? ) ";
+        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, company, userid, status)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? , ?) ";
         $statement = $pdo->prepare($sql);
-        $statement->execute([$uuid["uuid"], $materialcode, $userid, "OPEN"]);
+        $statement->execute([$uuid["uuid"], $materialcode, $company, $userid, "OPEN"]);
         
 
-        $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND COALESCE(sku, parentsku) = ?");
-        $stmtShopee->execute([ $materialcode]);
+        $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+        $stmtShopee->execute([ $materialcode, $company]);
         $shopee = $stmtShopee->fetch();
         
         $shopeeID = $shopee["productid"];
@@ -199,8 +195,8 @@ class StocksController extends Controller
                 ]);
         }
 
-        $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND COALESCE(sku, parentsku) = ?");
-        $stmtLazada->execute([ $materialcode]);
+        $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND company = ? AND COALESCE(sku, parentsku) = ?");
+        $stmtLazada->execute([ $materialcode, $company]);
         $lazada = $stmtLazada->fetch();
 
         $lazadaID = $lazada["productid"];
@@ -219,8 +215,6 @@ class StocksController extends Controller
                     ,"OPEN"
                 ]);
         }
-
-
 
     }
 

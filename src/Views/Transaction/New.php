@@ -13,16 +13,20 @@
                         <div class="card-header">
                             <h3 class="card-title">Sync Material Code</h3>
                         </div>
-
                         <form id="frmData" action="" method="post" enctype="multipart/form-data" >
                             <div class="card-body">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Company</label>
+                                    <select name="company" class="form-control form-select-sm">
+                                        <option>ROBERTS</option>
+                                        <option>URATEX</option>
+                                    </select>
+                                </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Material Code</label>
                                     <input name="materialcode" id="materialcode" type="text" class="form-control form-control-border border-width-2" />
                                 </div>
-                               
                             </div>
-
                             <div class="card-footer">
                                 <button type="button" id="btnSubmit" class="btn btn-primary">Submit</button>
                             </div>
