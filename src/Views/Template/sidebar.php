@@ -3,7 +3,7 @@
   <!-- Brand Logo -->
   <a style="background-color: #57A8FF;" href="#" class="brand-link">
     <img src="Assets/assets/images/uratex-logo.png" alt="ddd" class="brand-image" style="opacity: .8">&nbsp;
-    <span style="font-size: 15px;" class="brand-text font-weight-bold" id="titlespan"><strong>sss</strong></span>
+    <span style="font-size: 15px;" class="brand-text font-weight-bold" id="titlespan"><strong>Stock Alignment</strong></span>
   </a>
 
   <!-- Sidebar -->
