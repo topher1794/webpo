@@ -5,7 +5,7 @@ use stockalignment\Router;
 require_once realpath("vendor/autoload.php");
 
 
-error_reporting(0);
+// error_reporting(0);
 
 ob_start();
 if (session_status() == PHP_SESSION_NONE) {
@@ -59,5 +59,13 @@ $router->post('/stocktransaction', stockalignment\Controller\StocksController::c
 $router->post('/uploadmaster', stockalignment\Controller\MasterController::class, 'uploadmaster');
 $router->post('/getSkus', stockalignment\Controller\MasterController::class, 'getSkus');
 $router->get('/sku', stockalignment\Controller\MasterController::class, 'sku');
+
+
+/**
+ * Swagger
+ */
+
+ $router->get('/swaggerapi', stockalignment\Controller\StocksController::class, 'swaggerapi');
+
 
 $router->dispatch();

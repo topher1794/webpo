@@ -293,6 +293,16 @@ class StocksController extends Controller
     
     }
 
+    
+    public function swaggerapi()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "stocks";
+        $data['action'] = "api";
+
+        $this->render('Swagger/api.php', $data);
+    }
+
 
     function getAccessToken()
     {
