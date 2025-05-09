@@ -40,7 +40,7 @@ class StocksController extends Controller
         $this->render('Template/footer.php', $data);
     }
 
-    
+
     public function transactionlogs()
     {
         $data['logs'] = $_POST;
@@ -53,7 +53,7 @@ class StocksController extends Controller
         $this->render('Template/footer.php', $data);
     }
 
-    
+
     public function newsync()
     {
         $data['logs'] = $_POST;
@@ -102,26 +102,26 @@ class StocksController extends Controller
         // $empname = $_POST["empname"] ?? "";
         // $qty = $_POST["qty"] ?? "";
 
-        
+
 
 
         $stockQty = $this->getStocks($materialcode);
 
-        if(empty($stockQty)){
-            echo json_encode(array("result"=> "error", "message" => "Material code not found"));
+        if (empty($stockQty)) {
+            echo json_encode(array("result" => "error", "message" => "Material code not found"));
             exit();
         }
 
         $stockArr = explode("<br>", $stockQty);
         $sQty = 0.0;
-        foreach($stockArr as $arr){
+        foreach ($stockArr as $arr) {
             $arrData = explode("|", $arr);
             $qty = $arrData[2];
             $qty = trim($qty);
-            $sQty += (double) $qty;
+            $sQty += (float) $qty;
         }
-        if(empty($stockQty)){
-            echo json_encode(array("result"=> "error", "message" => "No quantity found"));
+        if (empty($stockQty)) {
+            echo json_encode(array("result" => "error", "message" => "No quantity found"));
             exit();
         }
 
@@ -142,8 +142,6 @@ class StocksController extends Controller
         );
 
         $this->syncStock($data);
-
-
     }
 
 
@@ -168,7 +166,7 @@ class StocksController extends Controller
 
         /**
          * insert into logs
-        */
+         */
         $stmtUuid = $pdo->prepare("SELECT uuid() as uuid");
         $stmtUuid->execute();
         $uuid = $stmtUuid->fetch();
@@ -176,52 +174,49 @@ class StocksController extends Controller
         $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, userid, status)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? ) ";
         $statement = $pdo->prepare($sql);
         $statement->execute([$uuid["uuid"], $materialcode, $userid, "OPEN"]);
-        
+
 
         $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND COALESCE(sku, parentsku) = ?");
-        $stmtShopee->execute([ $materialcode]);
+        $stmtShopee->execute([$materialcode]);
         $shopee = $stmtShopee->fetch();
-        
+
         $shopeeID = $shopee["productid"];
 
-        if(!empty($shopeeID)) {
-             //shopee
+        if (!empty($shopeeID)) {
+            //shopee
             $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus)VALUES(
                 ?, uuid(), ?, ?, ?, ?, ? ) ";
-                $statement = $pdo->prepare($sql);
-                $statement->execute([
-                    $uuid["uuid"]
-                    , $materialcode
-                    , "SHOPEE"
-                    , $shopeeID
-                    , $shopeeQty
-                    ,"OPEN"
-                ]);
+            $statement = $pdo->prepare($sql);
+            $statement->execute([
+                $uuid["uuid"],
+                $materialcode,
+                "SHOPEE",
+                $shopeeID,
+                $shopeeQty,
+                "OPEN"
+            ]);
         }
 
         $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND COALESCE(sku, parentsku) = ?");
-        $stmtLazada->execute([ $materialcode]);
+        $stmtLazada->execute([$materialcode]);
         $lazada = $stmtLazada->fetch();
 
         $lazadaID = $lazada["productid"];
-        
-        if(!empty($lazadaID)) {
-             //shopee
+
+        if (!empty($lazadaID)) {
+            //shopee
             $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus)VALUES(
                 ?, uuid(), ?, ?, ?, ?, ? ) ";
-                $statement = $pdo->prepare($sql);
-                $statement->execute([
-                    $uuid["uuid"]
-                    , $materialcode
-                    , "LAZADA"
-                    , $lazadaID
-                    , $lazadaQty
-                    ,"OPEN"
-                ]);
+            $statement = $pdo->prepare($sql);
+            $statement->execute([
+                $uuid["uuid"],
+                $materialcode,
+                "LAZADA",
+                $lazadaID,
+                $lazadaQty,
+                "OPEN"
+            ]);
         }
-
-
-
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -246,7 +241,7 @@ class StocksController extends Controller
         // echo "ddd" ;
         // print_r($_GET);
 
-        if(empty($materialcode)) {
+        if (empty($materialcode)) {
             $materialcode = $_GET["materialcode"];
         }
 
@@ -272,10 +267,11 @@ class StocksController extends Controller
     }
 
 
-    public function stocktransaction() {
+    public function stocktransaction()
+    {
         $pdo = $this->database->getPdo();
 
-        
+
         $draw = $_POST['draw'] ?? 1;
         $start = $_POST['start'] ?? 1;
         $length = $_POST['length'] ?? 1;
@@ -284,19 +280,18 @@ class StocksController extends Controller
         FROM 
         StockAlignSync 
         ";
-        $stmt = $pdo->query($sql );
+        $stmt = $pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
         $rowCount = count($data);
         $json_data = array(
-          "draw"            =>  $draw,
-          "recordsTotal"    => intval($rowCount),
-          "recordsFiltered" => intval($rowCount),
-          "data"            => $data
+            "draw"            =>  $draw,
+            "recordsTotal"    => intval($rowCount),
+            "recordsFiltered" => intval($rowCount),
+            "data"            => $data
         );
         echo json_encode($json_data, JSON_PRETTY_PRINT);
-    
     }
 
 
@@ -397,6 +392,7 @@ class StocksController extends Controller
         curl_close($curl);
         echo $response;
     }
+
     function getAccessTokenLazada()
     {
         $url = "https://api.lazada.com/rest";
@@ -411,5 +407,21 @@ class StocksController extends Controller
         var_dump($c->execute($request));
 
         print_r("sfsf ");
+    }
+
+    function selectValues(String $settingsVal)
+    {
+
+        $pdo = $this->database->getPdo();
+
+        $settingsVal = ($settingsVal == 'shopee' ? 'rob_shopee_value' : 'rob_lazada_value');
+
+        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . $settingsVal . "'";
+
+        $sql = $pdo->prepare($sql);
+        $sql->execute();
+        $values = $sql->fetch();
+
+        echo $values['attributes'];
     }
 }
