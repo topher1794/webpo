@@ -94,15 +94,9 @@ class StocksController extends Controller
 
 
         $materialcode = $_POST["materialcode"] ?? "";
+        $company = $_POST["company"] ?? "";
         $userid = $_SESSION["userno"];
         $empname = $_SESSION["empname"];
-
-
-        // $userid = $_POST["userno"] ?? "";
-        // $empname = $_POST["empname"] ?? "";
-        // $qty = $_POST["qty"] ?? "";
-
-
 
 
         $stockQty = $this->getStocks($materialcode);
@@ -137,6 +131,7 @@ class StocksController extends Controller
             "userid" => $userid,
             "empname" => $empname,
             "materialcode" => $materialcode,
+            "company" => $company,
             "shopee" => $shopeeQty,
             "lazada" => $lazadaQty,
         );
@@ -161,6 +156,7 @@ class StocksController extends Controller
         $empname = $data["empname"];
         $source = $data["source"];
         $materialcode = $data["materialcode"];
+        $company = $data["company"];
         $shopeeQty = $data["shopee"];
         $lazadaQty = $data["lazada"];
 
@@ -171,13 +167,13 @@ class StocksController extends Controller
         $stmtUuid->execute();
         $uuid = $stmtUuid->fetch();
 
-        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, userid, status)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? ) ";
+        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, company, userid, status)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? , ?) ";
         $statement = $pdo->prepare($sql);
-        $statement->execute([$uuid["uuid"], $materialcode, $userid, "OPEN"]);
+        $statement->execute([$uuid["uuid"], $materialcode, $company, $userid, "OPEN"]);
 
 
-        $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND COALESCE(sku, parentsku) = ?");
-        $stmtShopee->execute([$materialcode]);
+        $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+        $stmtShopee->execute([$materialcode, $company]);
         $shopee = $stmtShopee->fetch();
 
         $shopeeID = $shopee["productid"];
@@ -195,10 +191,12 @@ class StocksController extends Controller
                 $shopeeQty,
                 "OPEN"
             ]);
+
+            $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         }
 
-        $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND COALESCE(sku, parentsku) = ?");
-        $stmtLazada->execute([$materialcode]);
+        $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND company = ? AND COALESCE(sku, parentsku) = ?");
+        $stmtLazada->execute([$materialcode, $company]);
         $lazada = $stmtLazada->fetch();
 
         $lazadaID = $lazada["productid"];
@@ -216,6 +214,8 @@ class StocksController extends Controller
                 $lazadaQty,
                 "OPEN"
             ]);
+
+            $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
         }
     }
 
@@ -227,11 +227,151 @@ class StocksController extends Controller
 
     public function syncLazadaStock(string $transactId, int $qty): bool
     {
+
+        $pdo = $this->database->getPdo();
+
+        $lazadaVal = $this->selectValues('lazada'); // get shopee requirements
+        $url = "https://api.lazada.com/rest";
+
+        $sql = "SELECT productid FROM StockAlignSync WHERE transactno = ? AND accttype = ?";
+        $sql = $pdo->prepare($sql);
+        $sql->execute([$transactId, 'LAZADA']);
+        $productID = $sql->fetch();
+
+
+        $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ?";
+        $getLazadaRequirements = $pdo->prepare($getLazadaRequirements);
+        $getLazadaRequirements->execute([$productID['productid']]);
+        $lazadaValues = $getLazadaRequirements->fetch();
+
+        $xml = "
+            <Request>   
+                <Product>      
+                    <Skus>   
+                        <!--single warehouse demo-->  
+                        <Sku>         
+                            <ItemId>" . $productID['productid'] . "</ItemId>         
+                            <SkuId>" . $lazadaValues['skuid'] . "</SkuId>         
+                            <SellerSku>" . $lazadaValues['sku'] . "</SellerSku>                                     
+                            <SellableQuantity>" . $qty . "</SellableQuantity>    
+                        </Sku>   
+                        <!--multi warehouse demo-->   
+                        <Sku>         
+                            <ItemId></ItemId>         
+                            <SkuId></SkuId>         
+                            <SellerSku></SellerSku>                
+                            <MultiWarehouseInventories>
+                                <MultiWarehouseInventory>             
+                                    <WarehouseCode></WarehouseCode>             
+                                    <SellableQuantity></SellableQuantity>           
+                                </MultiWarehouseInventory>           
+                                <MultiWarehouseInventory>             
+                                    <WarehouseCode></WarehouseCode>             
+                                    <SellableQuantity></SellableQuantity>           
+                                </MultiWarehouseInventory>          
+                            </MultiWarehouseInventories>        
+                        </Sku>   
+                    </Skus>   
+                </Product> 
+            </Request>
+        ";
+
+        $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
+        $request = new LazopRequest('/product/stock/sellable/update');
+        $request->addApiParam('payload', $xml);
+        $response = $c->execute($request, $lazadaVal['access_token']);
+
+
+        $sql = "UPDATE StockAlignSync SET payload = ?, response = ? WHERE transactno = ? AND acctype = ?";
+        $sql = $pdo->prepare($sql);
+        $sql->bind_param('sss', $xml, $response, 'LAZADA');
+        $sql->execute();
+
+
+
         return true;
     }
 
     public function syncShopeeStock(string $transactId, int $qty): bool
     {
+
+        $pdo = $this->database->getPdo();
+
+        $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
+
+        $timest = time();
+        $path = "/api/v2/product/update_stock";
+        $baseString = sprintf("%s%s%s", $shopeeVal['partnerID'], $path, $timest);
+        $sign = hash_hmac('sha256', $baseString, $shopeeVal['partnerKey']);
+
+        // get product ID
+        $getProductId = "SELECT productid FROM StockAlignSync WHERE transactno = ?";
+        $getProductId = $pdo->prepare($getProductId);
+        $getProductId->execute([$transactId]);
+        $productId = $getProductId->fetch();
+
+
+
+        // payload
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . $shopeeVal['partnerID'] . '&shop_id=' . $shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+                "item_id": ' . $productId['productid'] . ',
+                "stock_list": [
+                    {
+                        "model_id": 0,
+                
+                        "seller_stock": [
+                            {
+                                "stock": ' . $qty . '
+                            }
+                        ]
+                    }
+                ]
+            }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+
+        $payload = '
+        {
+            "item_id": ' . $productId['productid'] . ',
+            "stock_list": [
+                {
+                    "model_id": 0,
+            
+                    "seller_stock": [
+                        {
+                            "stock": ' . $qty . '
+                        }
+                    ]
+                }
+            ]
+        }';
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+
+        $sql = "UPDATE StockAlignSync SET payload = ?, response = ? WHERE transactno = ? AND acctype = ?";
+        $sql = $pdo->prepare($sql);
+        $sql->bind_param('sss', $payload, $response, 'SHOPEE');
+        $sql->execute();
+
+
+
         return true;
     }
 
@@ -409,7 +549,7 @@ class StocksController extends Controller
         print_r("sfsf ");
     }
 
-    function selectValues(String $settingsVal)
+    public function selectValues(String $settingsVal)
     {
 
         $pdo = $this->database->getPdo();
@@ -421,7 +561,6 @@ class StocksController extends Controller
         $sql = $pdo->prepare($sql);
         $sql->execute();
         $values = $sql->fetch();
-
-        echo $values['attributes'];
+        return json_decode($values['attributes'], true);
     }
 }

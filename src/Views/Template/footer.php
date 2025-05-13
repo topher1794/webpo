@@ -76,6 +76,15 @@
 <?php } ?>
 
 
+<?php if (in_array($controller, array("master"))) { ?>
+  <?php if (in_array($action, array("sku"))) { ?>
+    <script type="module"  src="Assets/js/Sku.js"></script>
+  <?php } ?>
+<?php } ?>
+
+
+
+
 </body>
 
 </html>

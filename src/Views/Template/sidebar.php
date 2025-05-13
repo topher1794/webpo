@@ -63,40 +63,11 @@
         </li>
 
 
-
-
         <li class="nav-item" id="li-dashboard">
-          <a href="modulecontrol?NewUpload&Upload" class="nav-link" id="lia-new" onclick="menuclick(this.id)">
-            <i class="fas fa-upload nav-icon" aria-hidden="true"></i>
-            <p>
-              New Upload
-            </p>
-          </a>
-        </li>
-
-        <li class="nav-item" id="li-dashboard">
-          <a href="modulecontrol?SoConfirmation&Upload" class="nav-link" id="lia-new" onclick="menuclick(this.id)">
-            <i class="fas fa-upload nav-icon" aria-hidden="true"></i>
-            <p>
-              Upload Confirmation
-            </p>
-          </a>
-        </li>
-
-        <li class="nav-item" id="li-dashboard">
-          <a href="modulecontrol?PrintSO&Printing" class="nav-link" id="lia-print" onclick="menuclick(this.id)">
-            <i class="fas fa-print nav-icon" aria-hidden="true"></i>
-            <p>
-              SO Printing
-            </p>
-          </a>
-        </li>
-
-        <li class="nav-item" id="li-dashboard">
-          <a href="modulecontrol?Report&Report" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+          <a href="sku" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
             <i class="fas fa-list nav-icon" aria-hidden="true"></i>
             <p>
-              Report
+              Masterlist
             </p>
           </a>
         </li>

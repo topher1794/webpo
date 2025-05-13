@@ -53,6 +53,11 @@ $router->get('/transactionlogs', stockalignment\Controller\StocksController::cla
 $router->post('/stocktransaction', stockalignment\Controller\StocksController::class, 'stocktransaction');
 
 
+/**
+ * MasterList
+ */
+$router->post('/uploadmaster', stockalignment\Controller\MasterController::class, 'uploadmaster');
+$router->post('/getSkus', stockalignment\Controller\MasterController::class, 'getSkus');
+$router->get('/sku', stockalignment\Controller\MasterController::class, 'sku');
 
- 
 $router->dispatch();
