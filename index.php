@@ -60,4 +60,12 @@ $router->post('/uploadmaster', stockalignment\Controller\MasterController::class
 $router->post('/getSkus', stockalignment\Controller\MasterController::class, 'getSkus');
 $router->get('/sku', stockalignment\Controller\MasterController::class, 'sku');
 
+
+/**
+ * Swagger
+ */
+
+ $router->get('/swaggerapi', stockalignment\Controller\StocksController::class, 'swaggerapi');
+
+
 $router->dispatch();

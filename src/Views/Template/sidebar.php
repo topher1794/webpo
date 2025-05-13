@@ -3,7 +3,7 @@
   <!-- Brand Logo -->
   <a style="background-color: #57A8FF;" href="#" class="brand-link">
     <img src="Assets/assets/images/uratex-logo.png" alt="ddd" class="brand-image" style="opacity: .8">&nbsp;
-    <span style="font-size: 15px;" class="brand-text font-weight-bold" id="titlespan"><strong>sss</strong></span>
+    <span style="font-size: 15px;" class="brand-text font-weight-bold" id="titlespan"><strong>Stock Alignment</strong></span>
   </a>
 
   <!-- Sidebar -->
@@ -68,6 +68,15 @@
             <i class="fas fa-list nav-icon" aria-hidden="true"></i>
             <p>
               Masterlist
+            </p>
+          </a>
+        </li>
+        
+        <li class="nav-item" id="li-dashboard">
+          <a target="_blank" href="swaggerapi" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+            <i class="fa fa-code nav-icon" aria-hidden="true"></i>
+            <p>
+              API
             </p>
           </a>
         </li>

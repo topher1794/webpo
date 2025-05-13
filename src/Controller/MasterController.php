@@ -62,6 +62,13 @@ class MasterController extends Controller{
                 $accttype = trim($accttype);
                 $parentsku = trim($parentsku);
                 $sku = trim($sku);
+
+                if(empty($sku)) {
+                    $sku = null;
+                }
+                if(empty($parentsku)) {
+                    $parentsku = null;
+                }
                 $productid = trim($productid);
                 $productname = trim($productname);
                 $skuid = trim($skuid);

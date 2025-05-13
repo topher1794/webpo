@@ -434,6 +434,16 @@ class StocksController extends Controller
         echo json_encode($json_data, JSON_PRETTY_PRINT);
     }
 
+    
+    public function swaggerapi()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "stocks";
+        $data['action'] = "api";
+
+        $this->render('Swagger/api.php', $data);
+    }
+
 
     function getAccessToken()
     {
