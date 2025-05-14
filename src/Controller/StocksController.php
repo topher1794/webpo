@@ -276,15 +276,21 @@ class StocksController extends Controller
             </Request>
         ";
 
+
+        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND acctype = ?";
+        $sql = $pdo->prepare($sql);
+        $sql->bind_param('ss', $xml, 'LAZADA');
+        $sql->execute();
+
         $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
         $request = new LazopRequest('/product/stock/sellable/update');
         $request->addApiParam('payload', $xml);
         $response = $c->execute($request, $lazadaVal['access_token']);
 
 
-        $sql = "UPDATE StockAlignSync SET payload = ?, response = ? WHERE transactno = ? AND acctype = ?";
+        $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('sss', $xml, $response, 'LAZADA');
+        $sql->bind_param('ss', $response, 'LAZADA');
         $sql->execute();
 
 
@@ -360,16 +366,19 @@ class StocksController extends Controller
             ]
         }';
 
+        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND acctype = ?";
+        $sql = $pdo->prepare($sql);
+        $sql->bind_param('ss', $payload, 'SHOPEE');
+        $sql->execute();
+
         $response = curl_exec($curl);
 
         curl_close($curl);
 
-
-        $sql = "UPDATE StockAlignSync SET payload = ?, response = ? WHERE transactno = ? AND acctype = ?";
+        $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('sss', $payload, $response, 'SHOPEE');
+        $sql->bind_param('ss', $response, 'SHOPEE');
         $sql->execute();
-
 
 
         return true;
@@ -434,7 +443,7 @@ class StocksController extends Controller
         echo json_encode($json_data, JSON_PRETTY_PRINT);
     }
 
-    
+
     public function swaggerapi()
     {
         $data['logs'] = $_POST;
