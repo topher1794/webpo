@@ -172,9 +172,15 @@ class StocksController extends Controller
         $statement->execute([$uuid["uuid"], $materialcode, $company, $userid, "OPEN"]);
 
 
-        $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
-        $stmtShopee->execute([$materialcode, $company]);
-        $shopee = $stmtShopee->fetch();
+        try {
+            $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+            $stmtShopee->execute([$company, $materialcode]);
+            $stmtShopee->execute();
+            $shopee = $stmtShopee->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            print_r($e);
+        }
+
 
         $shopeeID = $shopee["productid"];
 
@@ -191,13 +197,11 @@ class StocksController extends Controller
                 $shopeeQty,
                 "OPEN"
             ]);
-
-            $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         }
 
         $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND company = ? AND COALESCE(sku, parentsku) = ?");
-        $stmtLazada->execute([$materialcode, $company]);
-        $lazada = $stmtLazada->fetch();
+        $stmtLazada->execute([$company, $materialcode]);
+        $lazada = $stmtLazada->fetch(PDO::FETCH_ASSOC);
 
         $lazadaID = $lazada["productid"];
 
@@ -214,9 +218,10 @@ class StocksController extends Controller
                 $lazadaQty,
                 "OPEN"
             ]);
-
-            $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
         }
+
+        $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
+        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
