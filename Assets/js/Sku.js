@@ -2,6 +2,7 @@
 import ClsAsync from './ClsAsync.js';
 
 var clsSync = new ClsAsync('test');
+var myTable = "";
 
 $("form#frmUpload").submit(function(e) {
 
@@ -46,6 +47,8 @@ $("form#frmUpload").submit(function(e) {
                 });
 
                 $('#modal-xl').modal('hide');
+
+                myTable.ajax.reload();
             }
             
         },
@@ -63,7 +66,7 @@ $(function(){
 
 function loadList(){
 
-    $('#tblData').DataTable({
+    myTable = $('#tblData').DataTable({
         searching: true,
         pageLength: 15,
         'paging': true,
