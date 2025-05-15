@@ -115,7 +115,7 @@ class MasterController extends Controller{
 
         $sql = "SELECT accttype, parentsku, sku, productid, productname, skuid, shopsku, company 
                 FROM StockAlignSku 
-                WHERE accttype='SHOPEE' 
+                WHERE accttype is not null
         ";
         $stmt = $pdo->query($sql );
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
