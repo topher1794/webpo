@@ -83,12 +83,14 @@ class MasterController extends Controller{
                         $statement->execute([$company]);
                 }
 
+                $sqlArr = [
+                        $accttype, $parentsku, $sku , $productid, $productname, $skuid, $shopsku, $company
+                ];
+
                 $sql = "INSERT INTO StockAlignSku (accttype, parentsku, sku, productid, productname, skuid, shopsku, company) 
                 VALUES(?, ? ,? ,? ,?, ?, ?, ?);";
                     $statement = $pdo->prepare($sql);
-                    $statement->execute([
-                        $accttype, $parentsku, $sku , $productid, $productname, $skuid, $shopsku, $company
-                    ]);
+                    $statement->execute($sqlArr);
             }
             $rowno++;
         }
