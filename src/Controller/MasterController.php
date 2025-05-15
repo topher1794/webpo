@@ -78,9 +78,9 @@ class MasterController extends Controller{
                      /**
                      * truncate first
                      */
-                    $sql = "DELETE FROM StockAlignSku WHERE company = ? ";
+                    $sql = "DELETE FROM StockAlignSku WHERE company = ? AND accttype = ? ";
                         $statement = $pdo->prepare($sql);
-                        $statement->execute([$company]);
+                        $statement->execute([$company, $accttype]);
                 }
 
                 $sqlArr = [
