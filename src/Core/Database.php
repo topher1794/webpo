@@ -44,6 +44,8 @@ class Database
             $this->SAPPort = "8001";
             $this->SAPIP = "10.0.220.165";
         }
+        $this->SAPPort = "8002";
+        $this->SAPIP = "10.0.220.168";
         $dbname = "ccms" . $dbname;
         $dbname = "uratexportal_DOPDBQAS";
 
