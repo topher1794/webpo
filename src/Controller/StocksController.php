@@ -286,7 +286,7 @@ class StocksController extends Controller
 
         $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('ss', $xml, 'LAZADA');
+        $sql->bind_param('sss', $xml, $transactId, 'LAZADA');
         $sql->execute();
 
         // $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
@@ -297,7 +297,7 @@ class StocksController extends Controller
 
         $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('ss', $response, 'LAZADA');
+        $sql->bind_param('sss', $response, $transactId, 'LAZADA');
         $sql->execute();
 
 
@@ -365,7 +365,7 @@ class StocksController extends Controller
 
         $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('ss', $payload, 'SHOPEE');
+        $sql->bind_param('sss', $payload, $transactId, 'SHOPEE');
         $sql->execute();
 
         // $response = curl_exec($curl);
@@ -374,7 +374,7 @@ class StocksController extends Controller
 
         $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('ss', $response, 'SHOPEE');
+        $sql->bind_param('sss', $response, $transactId, 'SHOPEE');
         $sql->execute();
 
 
