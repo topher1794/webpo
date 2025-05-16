@@ -220,9 +220,9 @@ class StocksController extends Controller
                 "OPEN"
             ]);
         }
-
+        $shopeeQty = 8;
         $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
-        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
+        // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -310,8 +310,12 @@ class StocksController extends Controller
 
         $timest = time();
         $path = "/api/v2/product/update_stock";
-        $baseString = sprintf("%s%s%s", $shopeeVal['partnerID'], $path, $timest);
-        $sign = hash_hmac('sha256', $baseString, $shopeeVal['partnerKey']);
+        $partnerId = '2010905';
+        $partnerKey = '5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58';
+        // $baseString = sprintf("%s%s%s", $shopeeVal['partnerID'], $path, $timest);
+        // $sign = hash_hmac('sha256', $baseString, $shopeeVal['partnerKey']);
+        $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
+        $sign = hash_hmac('sha256', $baseString, $partnerKey);
         $response = "";
 
         // get product ID
@@ -338,27 +342,30 @@ class StocksController extends Controller
 
 
 
-        // payload
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . $shopeeVal['partnerID'] . '&shop_id=' . $shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
-            ),
-        ));
-
-
 
         try {
+            // payload
+            $curl = curl_init();
+            $url = 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . $shopeeVal['partnerID'] . '&shop_id=' . (int)$shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '';
+            echo $url;
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json'
+                ),
+            ));
+
+
+
+
 
             $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND accttype = ?";
             $sql = $pdo->prepare($sql);
@@ -366,12 +373,14 @@ class StocksController extends Controller
 
             $response = curl_exec($curl);
 
+            print_r($response);
+
             curl_close($curl);
 
             $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND accttype = ?";
             $sql = $pdo->prepare($sql);
             $sql->execute([$response, $transactId, 'SHOPEE']);
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             print_r($e);
         }
 
@@ -457,8 +466,8 @@ class StocksController extends Controller
         $path = "/api/v2/auth/token/get";
 
         $code = "4c644953694743467a56714d63625a51";
-        $shopId = "322049526";
-        $partnerId = "2010905";
+        $shopId = 322049526;
+        $partnerId = 2010905;
         $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
 
         // {
