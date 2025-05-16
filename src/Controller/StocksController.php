@@ -308,15 +308,23 @@ class StocksController extends Controller
 
         $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
 
-        $timest = time();
+        // $timest = time();
         $path = "/api/v2/product/update_stock";
         $partnerId = '2010905';
         $partnerKey = '5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58';
-        // $baseString = sprintf("%s%s%s", $shopeeVal['partnerID'], $path, $timest);
-        // $sign = hash_hmac('sha256', $baseString, $shopeeVal['partnerKey']);
-        $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
+        $access_token = "444d4f6b425770514a78626668477652";
+        $shopid = "322049526";
+
+
+        // // $baseString = sprintf("%s%s%s", $shopeeVal['partnerID'], $path, $timest);
+        // // $sign = hash_hmac('sha256', $baseString, $shopeeVal['partnerKey']);
+        // $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
+        // $sign = hash_hmac('sha256', $baseString, $partnerKey);
+        // $response = "";
+
+        $timest = time();
+        $baseString = sprintf("%s%s%s%s%s", $partnerId, $path, $timest, $access_token, $shopid);
         $sign = hash_hmac('sha256', $baseString, $partnerKey);
-        $response = "";
 
         // get product ID
         $getProductId = "SELECT productid, modelid FROM StockAlignSync WHERE transactno = ?";
@@ -466,6 +474,7 @@ class StocksController extends Controller
         $path = "/api/v2/auth/token/get";
 
         $code = "4c644953694743467a56714d63625a51";
+        $code = "53624d53714f7251525a694c55796565";
         $shopId = 322049526;
         $partnerId = 2010905;
         $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
@@ -588,4 +597,51 @@ class StocksController extends Controller
         $values = $sql->fetch();
         return json_decode($values['attributes'], true);
     }
+
+    //  function getAccessToken()
+    // {
+    //     $host = "https://partner.shopeemobile.com";
+    //     $path = "/api/v2/auth/token/get";
+
+    //     $code = "4c644953694743467a56714d63625a51";
+    //     $shopId = 322049526;
+    //     $partnerId = 2010905;
+    //     $partnerKey = "5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58";
+
+    //     // {
+    //     //     "refresh_token": "424e446b6e6c6d725443766961697764",
+    //     //     "access_token": "444d4f6b425770514a78626668477652",
+    //     //     "expire_in": 14258,
+    //     //     "request_id": "e3e3e7f3326413861e2351dcc9f24e00",
+    //     //     "error": "",
+    //     //     "message": ""
+    //     //}
+
+    //     // &shop_id=322049526
+
+    //     $timest = time();
+    //     $body = array("code" => $code,  "shop_id" => $shopId, "partner_id" => $partnerId);
+    //     $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
+    //     $sign = hash_hmac('sha256', $baseString, $partnerKey);
+    //     $url = sprintf("%s%s?partner_id=%s&timestamp=%s&sign=%s", $host, $path, $partnerId, $timest, $sign);
+
+    //     echo $url;
+
+    //     echo json_encode($body);
+
+    //     $c = curl_init($url);
+    //     curl_setopt($c, CURLOPT_POST, 1);
+    //     curl_setopt($c, CURLOPT_POSTFIELDS, json_encode($body));
+    //     curl_setopt($c, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    //     curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+    //     $resp = curl_exec($c);
+    //     echo "raw result: $resp";
+
+    //     $ret = json_decode($resp, true);
+    //     $accessToken = $ret["access_token"];
+    //     $newRefreshToken = $ret["refresh_token"];
+    //     echo "\naccess_token: $accessToken, refresh_token: $newRefreshToken raw: $ret" . "\n";
+    //     return $ret;
+    // }
+
 }
