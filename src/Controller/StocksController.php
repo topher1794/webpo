@@ -171,7 +171,7 @@ class StocksController extends Controller
 
 
         try {
-            $stmtShopee = $pdo->prepare("SELECT productid, modelid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+            $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
             $stmtShopee->execute([$company, $materialcode]);
             $stmtShopee->execute();
             $shopee = $stmtShopee->fetch(PDO::FETCH_ASSOC);
@@ -184,7 +184,7 @@ class StocksController extends Controller
 
         if (!empty($shopeeID)) {
             //shopee
-            $modelID = $shopee["modelid"];
+            $modelID = $shopee["skuid"];
 
             $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus, modelid)VALUES(
                 ?, uuid(), ?, ?, ?, ?, ? , ?) ";
@@ -196,7 +196,7 @@ class StocksController extends Controller
                 $shopeeID,
                 $shopeeQty,
                 "OPEN",
-                 $modelID
+                $modelID
             ]);
         }
 
@@ -233,22 +233,21 @@ class StocksController extends Controller
 
     public function syncLazadaStock(string $transactId, int $qty): bool
     {
-
         $pdo = $this->database->getPdo();
         $response = "";
 
         $lazadaVal = $this->selectValues('lazada'); // get shopee requirements
         $url = "https://api.lazada.com/rest";
 
-        $sql = "SELECT productid FROM StockAlignSync WHERE transactno = ? AND accttype = ?";
+        $sql = "SELECT productid, materialcode FROM StockAlignSync WHERE transactno = ? AND accttype = ?";
         $sql = $pdo->prepare($sql);
         $sql->execute([$transactId, 'LAZADA']);
         $productID = $sql->fetch();
 
 
-        $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ?";
+        $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ? AND sku = ?";
         $getLazadaRequirements = $pdo->prepare($getLazadaRequirements);
-        $getLazadaRequirements->execute([$productID['productid']]);
+        $getLazadaRequirements->execute([$productID['productid'], $productID['materialcode']]);
         $lazadaValues = $getLazadaRequirements->fetch();
 
         $xml = "
@@ -284,10 +283,9 @@ class StocksController extends Controller
         ";
 
 
-        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND acctype = ?";
+        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND accttype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('sss', $xml, $transactId, 'LAZADA');
-        $sql->execute();
+        $sql->execute([$xml, $transactId, 'LAZADA']);
 
         // $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
         // $request = new LazopRequest('/product/stock/sellable/update');
@@ -297,8 +295,7 @@ class StocksController extends Controller
 
         $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->bind_param('sss', $response, $transactId, 'LAZADA');
-        $sql->execute();
+        $sql->execute($response, $transactId, 'LAZADA');
 
 
 
@@ -307,7 +304,6 @@ class StocksController extends Controller
 
     public function syncShopeeStock(string $transactId, int $qty): bool
     {
-
         $pdo = $this->database->getPdo();
 
         $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
@@ -343,39 +339,43 @@ class StocksController extends Controller
 
 
         // payload
-        // $curl = curl_init();
+        $curl = curl_init();
 
-        // curl_setopt_array($curl, array(
-        //     CURLOPT_URL => 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . $shopeeVal['partnerID'] . '&shop_id=' . $shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '',
-        //     CURLOPT_RETURNTRANSFER => true,
-        //     CURLOPT_ENCODING => '',
-        //     CURLOPT_MAXREDIRS => 10,
-        //     CURLOPT_TIMEOUT => 0,
-        //     CURLOPT_FOLLOWLOCATION => true,
-        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        //     CURLOPT_CUSTOMREQUEST => 'POST',
-        //     CURLOPT_POSTFIELDS => $payload,
-        //     CURLOPT_HTTPHEADER => array(
-        //         'Content-Type: application/json'
-        //     ),
-        // ));
-
-
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . $shopeeVal['partnerID'] . '&shop_id=' . $shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
 
 
-        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND acctype = ?";
-        $sql = $pdo->prepare($sql);
-        $sql->bind_param('sss', $payload, $transactId, 'SHOPEE');
-        $sql->execute();
 
-        // $response = curl_exec($curl);
+        try {
 
-        // curl_close($curl);
+            $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND accttype = ?";
+            $sql = $pdo->prepare($sql);
+            $sql->execute([$payload, $transactId, 'SHOPEE']);
 
-        $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
-        $sql = $pdo->prepare($sql);
-        $sql->bind_param('sss', $response, $transactId, 'SHOPEE');
-        $sql->execute();
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND accttype = ?";
+            $sql = $pdo->prepare($sql);
+            $sql->execute([$response, $transactId, 'SHOPEE']);
+        } catch (\PDOException $e) {
+            print_r($e);
+        }
+
+
 
 
         return true;
