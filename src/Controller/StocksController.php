@@ -171,7 +171,7 @@ class StocksController extends Controller
 
 
         try {
-            $stmtShopee = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+            $stmtShopee = $pdo->prepare("SELECT productid, modelid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
             $stmtShopee->execute([$company, $materialcode]);
             $stmtShopee->execute();
             $shopee = $stmtShopee->fetch(PDO::FETCH_ASSOC);
@@ -184,8 +184,10 @@ class StocksController extends Controller
 
         if (!empty($shopeeID)) {
             //shopee
-            $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus)VALUES(
-                ?, uuid(), ?, ?, ?, ?, ? ) ";
+            $modelID = $shopee["modelid"];
+
+            $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus, modelid)VALUES(
+                ?, uuid(), ?, ?, ?, ?, ? , ?) ";
             $statement = $pdo->prepare($sql);
             $statement->execute([
                 $uuid["uuid"],
@@ -193,7 +195,8 @@ class StocksController extends Controller
                 "SHOPEE",
                 $shopeeID,
                 $shopeeQty,
-                "OPEN"
+                "OPEN",
+                 $modelID
             ]);
         }
 
@@ -316,7 +319,7 @@ class StocksController extends Controller
         $response = "";
 
         // get product ID
-        $getProductId = "SELECT productid FROM StockAlignSync WHERE transactno = ?";
+        $getProductId = "SELECT productid, modelid FROM StockAlignSync WHERE transactno = ?";
         $getProductId = $pdo->prepare($getProductId);
         $getProductId->execute([$transactId]);
         $productId = $getProductId->fetch();
@@ -326,7 +329,7 @@ class StocksController extends Controller
             "item_id": ' . $productId['productid'] . ',
             "stock_list": [
                 {
-                    "model_id": 0,
+                    "model_id": ' . $productId['modelid'] . ',
             
                     "seller_stock": [
                         {
