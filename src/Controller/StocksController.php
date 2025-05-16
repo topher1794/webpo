@@ -120,11 +120,9 @@ class StocksController extends Controller
         }
 
 
-        $shopeeQty = $sQty * .60;
+        $shopeeQty = $sQty * .65;
         $shopeeQty =  ceil($shopeeQty);
         $lazadaQty =  $sQty - $shopeeQty;
-        $lazadaQty =  ceil($lazadaQty);
-
 
 
         $data = array(
