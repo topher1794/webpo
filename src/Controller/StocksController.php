@@ -220,9 +220,8 @@ class StocksController extends Controller
                 "OPEN"
             ]);
         }
-        $shopeeQty = 8;
         $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
-        // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
+        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -237,12 +236,14 @@ class StocksController extends Controller
         $response = "";
 
         $lazadaVal = $this->selectValues('lazada'); // get shopee requirements
-        $url = "https://api.lazada.com/rest";
+        $url = "https://api.lazada.com.ph/rest"; // ORIG
 
         $sql = "SELECT productid, materialcode FROM StockAlignSync WHERE transactno = ? AND accttype = ?";
         $sql = $pdo->prepare($sql);
         $sql->execute([$transactId, 'LAZADA']);
         $productID = $sql->fetch();
+
+        $origQty = $this->getLazadaItem($productID['productid'], $productID['materialcode']);
 
 
         $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ? AND sku = ?";
@@ -250,6 +251,7 @@ class StocksController extends Controller
         $getLazadaRequirements->execute([$productID['productid'], $productID['materialcode']]);
         $lazadaValues = $getLazadaRequirements->fetch();
 
+        //  payload
         $xml = "
             <Request>   
                 <Product>      
@@ -282,15 +284,19 @@ class StocksController extends Controller
             </Request>
         ";
 
-
-        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND accttype = ?";
+        $sql = "UPDATE StockAlignSync SET payload = ?, orig_qty = ? WHERE transactno = ? AND accttype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->execute([$xml, $transactId, 'LAZADA']);
+        $sql->execute([$xml, $origQty, $transactId, 'LAZADA']);
 
-        // $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
-        // $request = new LazopRequest('/product/stock/sellable/update');
-        // $request->addApiParam('payload', $xml);
-        // $response = $c->execute($request, $lazadaVal['access_token']);
+        try {
+            $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
+            $request = new LazopRequest('/product/stock/sellable/update');
+            $request->addApiParam('payload', $xml);
+            var_dump($c->execute($request, $lazadaVal['access_token']));
+        } catch (\Exception $e) {
+            print_r($e);
+        }
+
 
 
         $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
@@ -298,8 +304,57 @@ class StocksController extends Controller
         $sql->execute($response, $transactId, 'LAZADA');
 
 
-
         return true;
+    }
+
+    public function getLazadaItem($productID, $sku)
+    {
+
+        $pdo = $this->database->getPdo();
+
+        $lazadaVal = $this->selectValues('lazada');
+
+        $url = "https://api.lazada.com.ph/rest";
+        $app_key = $lazadaVal['appkey'];
+        $appSecret = $lazadaVal['appSecret'];
+        $access_token = $lazadaVal['access_token'];
+        $origQty = 0;
+
+        try {
+            $c = new LazopClient($url, $app_key, $appSecret);
+            $request = new LazopRequest('/product/item/get', 'GET');
+            $request->addApiParam('item_id', $productID);
+            $request->addApiParam('seller_sku', $sku);
+            $result = $c->execute($request, $access_token);
+            $json = json_decode($result, true);
+            $qty = $json['data']['skus'];
+
+            for ($x = 0; $x < count($qty); $x++) {
+                if ($qty[$x]['SellerSku'] == $sku) {
+                    $origQty = $qty[$x]['multiWarehouseInventories'][0]['sellableQuantity'];
+                    break;
+                }
+            }
+        } catch (\Exception $e) {
+            print_r($e);
+        }
+
+        return $origQty;
+    }
+
+    function refreshLazadaToken()
+    {
+
+        $pdo = $this->database->getPdo();
+        $lazadaVal = $this->selectValues('lazada');
+
+        $url = "https://api.lazada.com/rest";
+        $appkey = "133053";
+        $appSecret = "M4V8k89Nv5pYtT7eafdFlxfDZsDOSaBY";
+        $c = new LazopClient($url, $appkey, $appSecret);
+        $request = new LazopRequest('/auth/token/refresh');
+        $request->addApiParam('refresh_token', $lazadaVal['refresh_token']);
+        var_dump($c->execute($request));
     }
 
     public function syncShopeeStock(string $transactId, int $qty): bool
@@ -308,19 +363,11 @@ class StocksController extends Controller
 
         $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
 
-        // $timest = time();
         $path = "/api/v2/product/update_stock";
-        $partnerId = '2010905';
-        $partnerKey = '5a7255626646637a4e6751514e43685669684878736a4c465a737a624e564b58';
-        $access_token = "444d4f6b425770514a78626668477652";
-        $shopid = "322049526";
-
-
-        // // $baseString = sprintf("%s%s%s", $shopeeVal['partnerID'], $path, $timest);
-        // // $sign = hash_hmac('sha256', $baseString, $shopeeVal['partnerKey']);
-        // $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
-        // $sign = hash_hmac('sha256', $baseString, $partnerKey);
-        // $response = "";
+        $partnerId = $shopeeVal['partnerID'];
+        $partnerKey = $shopeeVal['partnerKey'];
+        $access_token = $shopeeVal['access_token'];
+        $shopid = $shopeeVal['shopID'];
 
         $timest = time();
         $baseString = sprintf("%s%s%s%s%s", $partnerId, $path, $timest, $access_token, $shopid);
@@ -372,17 +419,12 @@ class StocksController extends Controller
             ));
 
 
-
-
-
             $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND accttype = ?";
             $sql = $pdo->prepare($sql);
             $sql->execute([$payload, $transactId, 'SHOPEE']);
 
+
             $response = curl_exec($curl);
-
-            print_r($response);
-
             curl_close($curl);
 
             $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND accttype = ?";
@@ -569,10 +611,10 @@ class StocksController extends Controller
 
     function getAccessTokenLazada()
     {
-        $url = "https://api.lazada.com/rest";
+        $url = "https://api.lazada.com.ph/rest";
         $appkey = "133053";
         $appSecret = 'M4V8k89Nv5pYtT7eafdFlxfDZsDOSaBY';
-        $code = '0_133053_BSLOsztup8ptwkoufwMNaYZD4348';
+        $code = '0_133053_5DO2OQvhWFXJAWSRvtMeMf2l7432';
 
         $c = new LazopClient($url,  $appkey, $appSecret);
         $request = new LazopRequest('/auth/token/create');

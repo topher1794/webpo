@@ -77,6 +77,8 @@ class Router
                 "syncviaform",
                 "Logout",
                 "api",
+                "refreshLazadaToken",
+                "getLazadaItem",
 
 
 
