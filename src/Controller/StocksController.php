@@ -220,8 +220,9 @@ class StocksController extends Controller
                 "OPEN"
             ]);
         }
+        $shopeeQty = 7;
         $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
-        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
+        // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -359,6 +360,7 @@ class StocksController extends Controller
 
     public function syncShopeeStock(string $transactId, int $qty): bool
     {
+
         $pdo = $this->database->getPdo();
 
         $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
@@ -424,7 +426,9 @@ class StocksController extends Controller
             $sql->execute([$payload, $transactId, 'SHOPEE']);
 
 
+            // $response = curl_exec($curl);
             $response = curl_exec($curl);
+
             curl_close($curl);
 
             $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND accttype = ?";
@@ -515,7 +519,7 @@ class StocksController extends Controller
         $host = "https://partner.shopeemobile.com";
         $path = "/api/v2/auth/token/get";
 
-        $code = "4c644953694743467a56714d63625a51";
+        // $code = "4c644953694743467a56714d63625a51";
         $code = "53624d53714f7251525a694c55796565";
         $shopId = 322049526;
         $partnerId = 2010905;
@@ -537,8 +541,6 @@ class StocksController extends Controller
         $baseString = sprintf("%s%s%s", $partnerId, $path, $timest);
         $sign = hash_hmac('sha256', $baseString, $partnerKey);
         $url = sprintf("%s%s?partner_id=%s&timestamp=%s&sign=%s", $host, $path, $partnerId, $timest, $sign);
-
-        echo $url;
 
         echo json_encode($body);
 
