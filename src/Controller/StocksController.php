@@ -206,6 +206,8 @@ class StocksController extends Controller
 
         $lazadaID = $lazada["productid"];
 
+
+
         if (!empty($lazadaID)) {
             //shopee
             $sql = "INSERT INTO StockAlignSync(transactno, syncno , materialcode, accttype, productid, qty, syncstatus)VALUES(
@@ -245,8 +247,9 @@ class StocksController extends Controller
             }
         }
 
+        $lazadaQty = 2;
         // $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
-        // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
+        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -269,8 +272,6 @@ class StocksController extends Controller
         $productID = $sql->fetch();
 
         $origQty = $this->getLazadaItem($productID['productid'], $productID['materialcode']);
-
-        $oldAccessToken = '50000901903fuve1cdc7694sqc7ehyiPVtEFjMm4kuTHh2AqpbxqyQLOX3bfejmp';
 
 
         $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ? AND sku = ?";
@@ -319,15 +320,14 @@ class StocksController extends Controller
             $c = new LazopClient($url, $lazadaVal['appkey'], $lazadaVal['appSecret']);
             $request = new LazopRequest('/product/stock/sellable/update');
             $request->addApiParam('payload', $xml);
-            // $response = $c->execute($request, $lazadaVal['access_token']);
-            $response = $c->execute($request, $oldAccessToken);
+            $response = $c->execute($request, $lazadaVal['access_token']);
+            // $response = $c->execute($request, $oldAccessToken);
         } catch (\Exception $e) {
             print_r($e);
         }
 
 
-
-        $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
+        $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND accttype = ?";
         $sql = $pdo->prepare($sql);
         $sql->execute([$response, $transactId, 'LAZADA']);
 
