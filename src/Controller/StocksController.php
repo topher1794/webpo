@@ -220,8 +220,20 @@ class StocksController extends Controller
                 "OPEN"
             ]);
         }
-        $shopeeQty = 7;
-        $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
+        // $shopeeQty = 7;
+
+        // check shopee token | qty
+
+
+        $jsonQty = $this->getStocksFromShopee($shopeeID);
+        $jsonDecodeShopee = json_decode($jsonQty, true) ;
+        if(isset($jsonDecodeShopee["message"])) {
+            if(strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false ) {
+                    // print_r($jsonDecodeShopee);
+                    // refreshtoken 
+            }
+        }
+        // $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
@@ -302,7 +314,7 @@ class StocksController extends Controller
 
         $sql = "UPDATE StockAlignSync SET response = ? WHERE transactno = ? AND acctype = ?";
         $sql = $pdo->prepare($sql);
-        $sql->execute($response, $transactId, 'LAZADA');
+        $sql->execute([$response, $transactId, 'LAZADA']);
 
 
         return true;
@@ -357,6 +369,9 @@ class StocksController extends Controller
         $request->addApiParam('refresh_token', $lazadaVal['refresh_token']);
         var_dump($c->execute($request));
     }
+
+
+
 
     public function syncShopeeStock(string $transactId, int $qty): bool
     {
@@ -442,6 +457,117 @@ class StocksController extends Controller
 
 
         return true;
+    }
+
+    public function getStocksFromShopee($itemID) {
+
+
+        $pdo = $this->database->getPdo();
+
+        $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
+
+        $path = "/api/v2/product/get_model_list";
+        $partnerId = $shopeeVal['partnerID'];
+        $partnerKey = $shopeeVal['partnerKey'];
+        $access_token = $shopeeVal['access_token'];
+        $shopid = $shopeeVal['shopID'];
+
+
+        $timest = time();
+        $baseString = sprintf("%s%s%s%s%s", $partnerId, $path, $timest, $access_token, $shopid);
+        $sign = hash_hmac('sha256', $baseString, $partnerKey);
+
+
+        $url = "https://partner.shopeemobile.com$path";
+        $query = http_build_query([
+            'partner_id'   => $partnerId,
+            'timestamp'    => $timest,
+            'access_token' => urlencode($access_token),
+            'shop_id'      => $shopid,
+            'sign'         => $sign,
+            'item_id' => $itemID
+        ]);
+
+       
+        try {
+
+            $ch = curl_init();
+
+            // Setup cURL options for GET
+            curl_setopt($ch, CURLOPT_URL, $url . '?' . $query);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // to skip permission
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json'
+            ]);
+
+            $response = curl_exec($ch);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                echo "cURL Error: $error";
+                return $error;
+            } else {
+                return $response;
+            }
+        } catch (\Exception $e) {
+            // print_r($e);
+        }
+
+    }
+
+    public function refreshShopeeToken() {
+         $pdo = $this->database->getPdo();
+
+        $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
+
+        $path = "/api/v2/auth/access_token/get";
+        $partnerId = $shopeeVal['partnerID'];
+        $partnerKey = $shopeeVal['partnerKey'];
+        $access_token = $shopeeVal['access_token'];
+        $refresh_token = $shopeeVal['refresh_token'];
+        $shopid = $shopeeVal['shopID'];
+
+
+        $timest = time();
+        $baseString = sprintf("%s%s%s%s%s", $partnerId, $path, $timest, $access_token, $shopid);
+        $sign = hash_hmac('sha256', $baseString, $partnerKey);
+
+
+        $url = "https://partner.shopeemobile.com$path";
+        $query = http_build_query([
+            'partner_id' => $partnerId,
+            'timestamp' => $timest,
+            'shop_id' => $shopid,
+            'sign' => $sign
+        ]);
+
+        $body = json_encode([
+            'shop_id' =>  $shopid,
+            'refresh_token' =>  $refresh_token,
+            'partner_id' =>  $partnerId,
+
+        ]);
+
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url .  $query);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+            $response = curl_exec($ch);
+            curl_close($ch);
+            echo $response;
+        } catch (\Exception $e) {
+            print_r($e);
+        }
+
+
+
     }
 
     public function getStocks(string $materialcode)
