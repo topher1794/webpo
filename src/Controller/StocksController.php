@@ -231,8 +231,20 @@ class StocksController extends Controller
             if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
                 // print_r($jsonDecodeShopee);
                 // refreshtoken 
+                $this->refreshShopeeToken();
+            }else{
+                $model = $jsonDecodeShopee["response"]["model"];
+                  // get product ID
+                $getProductId = "SELECT productid, modelid FROM StockAlignSync WHERE transactno = ?";
+                $getProductId = $pdo->prepare($getProductId);
+                $getProductId->execute($uuid["uuid"]);
+        $productId = $getProductId->fetch();
+                print_r($model) ;
+
+
             }
         }
+
         // $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
@@ -541,39 +553,50 @@ class StocksController extends Controller
         $refresh_token = $shopeeVal['refresh_token'];
         $shopid = $shopeeVal['shopID'];
 
+        // $refresh_token = "74706e756e6f5a674259496a46545a50";
 
-        $timest = time();
-        $baseString = sprintf("%s%s%s%s%s", $partnerId, $path, $timest, $access_token, $shopid);
+
+        $timestamp = time();
+        $baseString = sprintf("%s%s%s%s", $partnerId, $path, $timestamp, $shopid);
         $sign = hash_hmac('sha256', $baseString, $partnerKey);
-
 
         $url = "https://partner.shopeemobile.com$path";
         $query = http_build_query([
             'partner_id' => $partnerId,
-            'timestamp' => $timest,
+            'timestamp' => $timestamp,
             'shop_id' => $shopid,
             'sign' => $sign
         ]);
 
         $body = json_encode([
-            'shop_id' =>  $shopid,
+            'shop_id' =>  (int)$shopid,
             'refresh_token' =>  $refresh_token,
-            'partner_id' =>  $partnerId,
+            'partner_id' =>  (int)$partnerId,
 
         ]);
 
         try {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url .  $query);
+            curl_setopt($ch, CURLOPT_URL, $url . "?" .  $query);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // to skip permission
+
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Content-Type: application/json'
             ]);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
             $response = curl_exec($ch);
+            $error = curl_error($ch);
             curl_close($ch);
-            echo $response;
+
+          
+            $response = json_decode($response, true);
+
+
+            $sql = $pdo->prepare("UPDATE StockAlignSettings SET `attributes` = JSON_SET(`attributes`, '$.access_token', ?, '$.refresh_token', ?) WHERE settingstype = ?");
+            $sql->execute([$response['access_token'], $response['refresh_token'], 'rob_shopee_value']);
+
         } catch (\Exception $e) {
             print_r($e);
         }
