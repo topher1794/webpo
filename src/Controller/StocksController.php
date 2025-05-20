@@ -222,33 +222,36 @@ class StocksController extends Controller
                 "OPEN"
             ]);
         }
-        // $shopeeQty = 7;
 
         // check shopee token | qty
-
-
+        $shopeeStock = 0;
         $jsonQty = $this->getStocksFromShopee($shopeeID);
         $jsonDecodeShopee = json_decode($jsonQty, true);
         if (isset($jsonDecodeShopee["message"])) {
             if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
-                // print_r($jsonDecodeShopee);
-                // refreshtoken 
                 $this->refreshShopeeToken();
-            }else{
-                $model = $jsonDecodeShopee["response"]["model"];
-                  // get product ID
-                $getProductId = "SELECT productid, modelid FROM StockAlignSync WHERE transactno = ?";
-                $getProductId = $pdo->prepare($getProductId);
-                $getProductId->execute($uuid["uuid"]);
-        $productId = $getProductId->fetch();
-                print_r($model) ;
-
-
+                //set when expired
+                $jsonQty = $this->getStocksFromShopee($shopeeID);
+                $jsonDecodeShopee = json_decode($jsonQty, true);
             }
+                $model = $jsonDecodeShopee["response"]["model"];
+                foreach($model as $i => $val) {
+                    $valModelId = $val["model_id"];
+                    if($valModelId == $shopee["skuid"]) {
+                        $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                        $sql = "UPDATE StockAlignSync SET orig_qty = ? WHERE transactno= ? and accttype = 'SHOPEE'";
+                        $statement = $pdo->prepare($sql);
+                        $statement->execute([
+                            $shopeeStock, $uuid["uuid"]
+                        ]);
+                        break;
+                    }
+                }
         }
 
-        $lazadaQty = 2;
-        // $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
+        $shopeeQty = 7;//ORIGINAL
+        $lazadaQty = 2;//ORIGINAL
+        $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
 
