@@ -220,27 +220,21 @@ class StocksController extends Controller
                 "OPEN"
             ]);
         }
-<<<<<<< Updated upstream
         // $shopeeQty = 7;
 
         // check shopee token | qty
 
 
         $jsonQty = $this->getStocksFromShopee($shopeeID);
-        $jsonDecodeShopee = json_decode($jsonQty, true) ;
-        if(isset($jsonDecodeShopee["message"])) {
-            if(strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false ) {
-                    // print_r($jsonDecodeShopee);
-                    // refreshtoken 
+        $jsonDecodeShopee = json_decode($jsonQty, true);
+        if (isset($jsonDecodeShopee["message"])) {
+            if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
+                // print_r($jsonDecodeShopee);
+                // refreshtoken 
             }
         }
         // $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         // $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
-=======
-        $lazadaQty = 2;
-        // $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
-        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
->>>>>>> Stashed changes
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -476,7 +470,8 @@ class StocksController extends Controller
         return true;
     }
 
-    public function getStocksFromShopee($itemID) {
+    public function getStocksFromShopee($itemID)
+    {
 
 
         $pdo = $this->database->getPdo();
@@ -505,7 +500,7 @@ class StocksController extends Controller
             'item_id' => $itemID
         ]);
 
-       
+
         try {
 
             $ch = curl_init();
@@ -531,11 +526,11 @@ class StocksController extends Controller
         } catch (\Exception $e) {
             // print_r($e);
         }
-
     }
 
-    public function refreshShopeeToken() {
-         $pdo = $this->database->getPdo();
+    public function refreshShopeeToken()
+    {
+        $pdo = $this->database->getPdo();
 
         $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
 
@@ -582,9 +577,6 @@ class StocksController extends Controller
         } catch (\Exception $e) {
             print_r($e);
         }
-
-
-
     }
 
     public function getStocks(string $materialcode)
