@@ -133,5 +133,39 @@ class MasterController extends Controller{
     }
 
 
+    
+    public function userlists()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "master";
+        $data['action'] = "users";
+
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Users/Lists.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
+    public function  getUsers(){
+         $pdo = $this->database->getPdo();
+
+        
+        $draw = $_POST['draw'] ?? 1;
+        $start = $_POST['start'] ?? 1;
+        $length = $_POST['length'] ?? 1;
+
+        $sql = "select id, firstname, lastname, username, emailadd, token, token_expiration,  status from StockAlignUsers ORDER BY firstname, lastname asc    ";
+        $stmt = $pdo->query($sql );
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $rowCount = count($data);
+        $json_data = array(
+          "draw"            =>  $draw,
+          "recordsTotal"    => intval($rowCount),
+          "recordsFiltered" => intval($rowCount),
+          "data"            => $data
+        );
+        echo json_encode($json_data, JSON_PRETTY_PRINT);
+    }
+
 
 }

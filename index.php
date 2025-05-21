@@ -69,5 +69,13 @@ $router->get('/sku', stockalignment\Controller\MasterController::class, 'sku');
 
 $router->get('/swaggerapi', stockalignment\Controller\StocksController::class, 'swaggerapi');
 
+/**
+ * Users
+*/
+
+$router->get('/users', stockalignment\Controller\MasterController::class, 'userlists');
+$router->post('/getUsers', stockalignment\Controller\MasterController::class, 'getUsers');
+
+
 
 $router->dispatch();

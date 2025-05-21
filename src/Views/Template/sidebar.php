@@ -71,6 +71,15 @@
             </p>
           </a>
         </li>
+
+         <li class="nav-item" id="li-dashboard">
+          <a href="users" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+            <i class="fas fa-user nav-icon" aria-hidden="true"></i>
+            <p>
+              Users
+            </p>
+          </a>
+        </li>
         
         <li class="nav-item" id="li-dashboard">
           <a target="_blank" href="swaggerapi" class="nav-link" id="lia-report" onclick="menuclick(this.id)">

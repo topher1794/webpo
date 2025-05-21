@@ -80,6 +80,12 @@
   <?php if (in_array($action, array("sku"))) { ?>
     <script type="module"  src="Assets/js/Sku.js"></script>
   <?php } ?>
+  
+  <?php if (in_array($action, array("users"))) { ?>
+    <script type="module"  src="Assets/js/Users.js"></script>
+  <?php } ?>
+
+  
 <?php } ?>
 
 
