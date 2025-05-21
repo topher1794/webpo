@@ -108,7 +108,7 @@ class StocksController extends Controller
 
 
         if (!password_verify($password, $stored_hash)) {
-             http_response_code(400);
+            http_response_code(400);
             echo json_encode(["message" => "Invalid authentication."], JSON_PRETTY_PRINT);
             exit();
         }
@@ -116,13 +116,13 @@ class StocksController extends Controller
         $userid = $user['id'];
         $empname = $user['empname'];
         if (empty($userid)) {
-             http_response_code(400);
+            http_response_code(400);
             echo json_encode(["message" => "User not found."], JSON_PRETTY_PRINT);
             exit();
         }
         $access_token = $_POST["access_token"];
         if (empty($access_token)) {
-             http_response_code(400);
+            http_response_code(400);
             echo json_encode(["message" => "Access Token not found."], JSON_PRETTY_PRINT);
             exit();
         }
@@ -139,10 +139,10 @@ class StocksController extends Controller
             exit();
         }
 
-        $today = strtotime(date("Y-m-d") );
+        $today = strtotime(date("Y-m-d"));
         $convExpired = strtotime($arrayToken["expireddate"]);
-   
-        if((int)$today > (int)$convExpired) {
+
+        if ((int)$today > (int)$convExpired) {
             http_response_code(400);
             echo json_encode(["message" => "Token is expired."], JSON_PRETTY_PRINT);
             exit();
@@ -152,11 +152,11 @@ class StocksController extends Controller
         $company = $_POST["company"] ?? "";
 
         $arrayData = array(
-            "materialcode" => $materialcode
-            ,"company" => $company
-            ,"userid" => $userid
-            ,"source" => "api"
-            ,"empname" => $empname
+            "materialcode" => $materialcode,
+            "company" => $company,
+            "userid" => $userid,
+            "source" => "api",
+            "empname" => $empname
         );
         $this->syncStockQty($arrayData);
     }
@@ -188,12 +188,12 @@ class StocksController extends Controller
         $company = $arrayData["company"];
 
         print_r($materialcode);
-        if(empty($materialcode)) {
-             echo json_encode(array("result" => "error", "message" => "Material code is empty."));
+        if (empty($materialcode)) {
+            echo json_encode(array("result" => "error", "message" => "Material code is empty."));
             exit();
         }
 
-         $stockQty = $this->getStocks($materialcode);
+        $stockQty = $this->getStocks($materialcode);
         $stockQty = $this->getStocks($materialcode);
 
         if (empty($stockQty)) {
@@ -779,10 +779,13 @@ class StocksController extends Controller
         $start = $_POST['start'] ?? 1;
         $length = $_POST['length'] ?? 1;
 
-        $sql = "SELECT transactno, syncno, accttype, materialcode, productid, qty, syncstatus, payload, response, synctime 
+        $page = $_POST['page'] ?? "";
+
+        $sql = "SELECT transactno, syncno, accttype, materialcode, productid, qty, syncstatus, payload, response, synctime, (SELECT productname FROM StockAlignSku WHERE productid = StockAlignSync.productid LIMIT 1) as acctName
         FROM 
-        StockAlignSync 
+        StockAlignSync WHERE syncstatus = '" . $page . "'
         ";
+
         $stmt = $pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
