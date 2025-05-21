@@ -76,12 +76,12 @@ class Router
                 "newRegistration",
                 "syncviaform",
                 "Logout",
-                "api",
                 "refreshLazadaToken",
                 "getLazadaItem",
-
-
-
+                "swaggerapi",
+                "updatestockv1",
+                "apitokenv1",
+                "apirefreshtokenv1",
             );
             // print_r($uri);
             // exit();

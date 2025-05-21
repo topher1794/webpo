@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,6 +8,7 @@
   <title>SwaggerUI</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
 </head>
+
 <body>
   <div id="swagger-ui"></div>
   <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js" crossorigin></script>
@@ -17,68 +17,33 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0.0",
-    "title": "Stock Alignment Project",
-    "description": "Generated  "
+    "title": "Stock Alignment API",
+    "description": "To acquire a bearer token, navigate to https://www.base64encode.org/ and enter your company email address. Subsequently, copy the generated output and utilize it for bearer authentication.\n"
   },
-  "host": "intra.uratex.com.ph/stockalignment",
+  "host": "https://intra.uratex.com.ph/stockalignproj/",
   "schemes": [
-    "https",
+    "http",
   ],
-//   "securityDefinitions": {
-//     "Bearer": {
-//       "type": "apiKey",
-//       "name": "Authorization",
-//       "in": "header",
-//       "description": "Enter the token with the `Bearer: ` prefix, e.g. \"Bearer abcde12345\"."
-//     }
-//   },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter the token with the `Bearer: ` value must be combination of username and password in base64 encoded format."
+    }
+  },
   "paths": {
-//     "/getToken": {
-//       "post": {
-//         "summary": "To get Token",
-//         "security": [
-//           {
-//             "Bearer": []
-//           }
-//         ],
-//         "responses": {
-//           "200": {
-//             "description": "Will send access token"
-//           },
-//           "403": {
-//             "description": "You do not have necessary permissions for the resource"
-//           }
-//         }
-//       }
-//     }
-//   ,
-    "/authentication/checkMDMLogin": {
+    "/apitokenv1": {
       "post": {
-        "summary": "Get token from MDM api.",
+        "summary": "getting token",
         "security": [
           {
             "Bearer": []
           }
         ],
-        "parameters": [
-          {
-            "name": "emailaddress",
-            "in": "formData",
-            "description": "Email address (must be base64 decoded) ",
-            "required": true,
-            "type": "string"
-          },
-        //   {
-        //     "name": "access_token",
-        //     "in": "formData",
-        //     "description": "Generated token",
-        //     "required": true,
-        //     "type": "string"
-        //   }
-        ],
         "responses": {
           "200": {
-            "description": "Will send token"
+            "description": "Will send access token"
           },
           "403": {
             "description": "You do not have necessary permissions for the resource"
@@ -86,9 +51,9 @@
         }
       }
     }
-    ,"/mdm/getForApproval": {
+    ,"/apirefreshtokenv1": {
       "post": {
-        "summary": "Get approval count.",
+        "summary": "refreshing token",
         "security": [
           {
             "Bearer": []
@@ -96,17 +61,16 @@
         ],
         "parameters": [
           {
-            "name": "token",
+            "name": "refresh_token",
             "in": "formData",
-            "description": "Token generated",
+            "description": "Refresh token value",
             "required": true,
             "type": "string"
           },
-       
         ],
         "responses": {
           "200": {
-            "description": "Will send an approval count."
+            "description": "Will refresh token"
           },
           "403": {
             "description": "You do not have necessary permissions for the resource"
@@ -114,9 +78,9 @@
         }
       }
     }
-    ,"/authentication/login": {
+     ,"/updatestockv1": {
       "post": {
-        "summary": ".",
+        "summary": "Updating of Stocks",
         "security": [
           {
             "Bearer": []
@@ -124,17 +88,30 @@
         ],
         "parameters": [
           {
-            "name": "token",
+            "name": "access_token",
             "in": "formData",
-            "description": "Token generated",
+            "description": "Refresh token value",
             "required": true,
             "type": "string"
           },
-       
+          {
+            "name": "materialcode",
+            "in": "formData",
+            "description": "Material code of products",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "company",
+            "in": "formData",
+            "description": "Company name",
+            "required": true,
+            "type": "string"
+          },
         ],
         "responses": {
           "200": {
-            "description": "Will redirect to dashboard page."
+            "description": "Will refresh token"
           },
           "403": {
             "description": "You do not have necessary permissions for the resource"
@@ -142,6 +119,7 @@
         }
       }
     }
+
 
 
   }
