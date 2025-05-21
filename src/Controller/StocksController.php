@@ -88,6 +88,8 @@ class StocksController extends Controller
         $bearerToken = getallheaders()["Authorization"] ?? "";
         $bearerToken = str_replace("Bearer ", "", $bearerToken);
 
+        print_r("sss");
+
 
         $materialcode = $_POST["materialcode"] ?? "";
         $company = $_POST["company"] ?? "";
@@ -98,7 +100,7 @@ class StocksController extends Controller
             "materialcode" => $materialcode
             ,"company" => $company
             ,"userid" => $userid
-            ,"source" => "form"
+            ,"source" => "api"
             ,"empname" => $empname
         );
         $this->syncStockQty($arrayData);
@@ -127,6 +129,11 @@ class StocksController extends Controller
         $userid = $arrayData["userid"];
         $empname = $arrayData["empname"];
         $company = $arrayData["company"];
+
+        if(empty($materialcode)) {
+             echo json_encode(array("result" => "error", "message" => "Material code is empty."));
+            exit();
+        }
 
          $stockQty = $this->getStocks($materialcode);
 
@@ -200,7 +207,7 @@ class StocksController extends Controller
         $statement = $pdo->prepare($sql);
         $statement->execute([$uuid["uuid"], $materialcode, $company, $userid, "OPEN", $source]);
 
-
+        
         try {
             $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
             $stmtShopee->execute([$company, $materialcode]);
@@ -856,6 +863,7 @@ class StocksController extends Controller
         $values = $sql->fetch();
         return json_decode($values['attributes'], true);
     }
+
 
     //  function getAccessToken()
     // {

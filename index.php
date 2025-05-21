@@ -77,5 +77,10 @@ $router->get('/users', stockalignment\Controller\MasterController::class, 'userl
 $router->post('/getUsers', stockalignment\Controller\MasterController::class, 'getUsers');
 
 
+/**
+ * API
+ */
+$router->post('/apiv1', stockalignment\Controller\StocksController::class, 'syncapi');
+
 
 $router->dispatch();
