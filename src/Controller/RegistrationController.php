@@ -5,6 +5,7 @@ namespace stockalignment\Controller;
 use PhpParser\PrettyPrinter;
 use stockalignment\Model\UserModel;
 use stockalignment\Controller;
+use stockalignment\Classes\Jwt;
 
 class RegistrationController extends Controller
 {
@@ -59,4 +60,6 @@ class RegistrationController extends Controller
 
         return ['status' => 201, 'message' => 'User registered'];
     }
+
+   
 }
