@@ -81,6 +81,9 @@ $router->post('/getUsers', stockalignment\Controller\MasterController::class, 'g
  * API
  */
 $router->post('/apiv1', stockalignment\Controller\StocksController::class, 'syncapi');
+$router->post('/apitokenv1', stockalignment\Controller\AuthenticationController::class, 'generateToken');
+$router->post('/apirefreshtokenv1', stockalignment\Controller\AuthenticationController::class, 'refreshToken');
+
 
 
 $router->dispatch();

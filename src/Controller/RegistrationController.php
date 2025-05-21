@@ -61,28 +61,5 @@ class RegistrationController extends Controller
         return ['status' => 201, 'message' => 'User registered'];
     }
 
-    public function generateToken() {
-
-          $sha1Token = sha1(rand());
-
-            $payload = [
-                 "token" => $bearerToken
-                ,"sha1Token" => $sha1Token
-                ,"exp" => time() + ( 15 * 60) //FOR 15 minutes
-            ];
-
-            $SECRET_KEY = "API_UX1968";
-            $JwtController = new Jwt($SECRET_KEY);
-            
-            $access_token = $JwtController->encode($payload);
-         
-    
-    
-            $encoded  = $JwtController->decode($access_token); //token 
-                
-            $newToken =  json_encode([
-                    "access_token" => $access_token,
-                    "expires_at" => $encoded["exp"],
-            ]);
-    }
+   
 }

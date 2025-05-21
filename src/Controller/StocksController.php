@@ -8,6 +8,7 @@ use stockalignment\Model\DatabaseModel;
 use stockalignment\Controller;
 use Lazada\LazopClient;
 use Lazada\LazopRequest;
+use DateTime;
 
 use PDO;
 // use Firebase\JWT\JWT;
@@ -70,6 +71,7 @@ class StocksController extends Controller
 
     public function syncapi()
     {
+
         // get Bearer
 
         if (array_key_exists("Authorization", getallheaders())) {
@@ -85,16 +87,69 @@ class StocksController extends Controller
             exit();
         }
 
+        $pdo = $this->database->getPdo();
+
         $bearerToken = getallheaders()["Authorization"] ?? "";
         $bearerToken = str_replace("Bearer ", "", $bearerToken);
 
-        print_r("sss");
+        // print_r($bearerToken);
 
+        $decodeToken = base64_decode($bearerToken);
+
+        $explode2 = explode(":", $decodeToken, 2);
+        $param1 = $explode2[0];
+        $password = $explode2[1];
+
+        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, empname FROM StockAlignUsers WHERE username = :username");
+        $stmt->bindParam(':username', $param1);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stored_hash = $user['password'];
+
+
+        if (!password_verify($password, $stored_hash)) {
+             http_response_code(400);
+            echo json_encode(["message" => "Invalid authentication."], JSON_PRETTY_PRINT);
+            exit();
+        }
+
+        $userid = $user['id'];
+        $empname = $user['empname'];
+        if (empty($userid)) {
+             http_response_code(400);
+            echo json_encode(["message" => "User not found."], JSON_PRETTY_PRINT);
+            exit();
+        }
+        $access_token = $_POST["access_token"];
+        if (empty($access_token)) {
+             http_response_code(400);
+            echo json_encode(["message" => "Access Token not found."], JSON_PRETTY_PRINT);
+            exit();
+        }
+
+
+        $stmt = $pdo->prepare("SELECT date(expireddate) as expireddate , access_token FROM StockAlignTokens WHERE userid = :userid AND access_token = :access_token AND status ");
+        $stmt->bindParam(':userid', $userid);
+        $stmt->bindParam(':access_token', $access_token);
+        $stmt->execute();
+        $arrayToken = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (empty($arrayToken)) {
+            http_response_code(400);
+            echo json_encode(["message" => "Access token not found."], JSON_PRETTY_PRINT);
+            exit();
+        }
+
+        $today = strtotime(date("Y-m-d") );
+        $convExpired = strtotime($arrayToken["expireddate"]);
+   
+        if((int)$today > (int)$convExpired) {
+            http_response_code(400);
+            echo json_encode(["message" => "Token is expired."], JSON_PRETTY_PRINT);
+            exit();
+        }
 
         $materialcode = $_POST["materialcode"] ?? "";
         $company = $_POST["company"] ?? "";
-        $userid = "";
-        $empname = "";
 
         $arrayData = array(
             "materialcode" => $materialcode
@@ -132,6 +187,7 @@ class StocksController extends Controller
         $empname = $arrayData["empname"];
         $company = $arrayData["company"];
 
+        print_r($materialcode);
         if(empty($materialcode)) {
              echo json_encode(array("result" => "error", "message" => "Material code is empty."));
             exit();
