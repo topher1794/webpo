@@ -30,14 +30,16 @@ class RegistrationController extends Controller
         $dataDecoded = json_decode($jsonData, true);
 
         $username = $dataDecoded["username"] ?? "";
+        $firstname = $dataDecoded["firstname"] ?? "";
+        $lastname = $dataDecoded["lastname"] ?? "";
         $email = $dataDecoded["email"] ?? "";
         $password = $dataDecoded["password"] ?? "";
         $confirmpassword = $dataDecoded["confirm-password"] ?? "";
 
-        echo json_encode($this->register($username, $email, $password, $confirmpassword), JSON_PRETTY_PRINT);
+        echo json_encode($this->register($username, $firstname, $lastname, $email, $password, $confirmpassword), JSON_PRETTY_PRINT);
     }
 
-    public function register(string $username, string $email, string $password, string $newPassword): array
+    public function register(string $username, string $firstname, string $lastname, string $email, string $password, string $newPassword): array
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return ['status' => 400, 'message' => 'Invalid email format!'];
@@ -51,15 +53,17 @@ class RegistrationController extends Controller
             return ['status' => 409, 'message' => 'Email already registered!'];
         }
 
+        if ($this->userModel->usernameExists($username)) {
+            return ['status' => 409, 'message' => 'Username already registered!'];
+        }
+
         if ($password != $newPassword) {
             return ['status' => 400, 'message' => 'Password is not the same!'];
         }
 
         $hash = password_hash($password, PASSWORD_BCRYPT);
-        $this->userModel->createUser($username, $email, $hash);
+        $this->userModel->createUser($username, $firstname, $lastname, $email, $hash);
 
         return ['status' => 201, 'message' => 'User registered'];
     }
-
-   
 }

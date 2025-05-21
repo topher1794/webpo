@@ -38,6 +38,20 @@
 								</div>
 
 								<div class="mb-3">
+									<input id="firstname" type="text" class="form-control" name="firstname" value="" placeholder="First Name" required>
+									<div class="invalid-feedback">
+										First Name is required
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<input id="lastname" type="text" class="form-control" name="lastname" value="" placeholder="Last Name" required>
+									<div class="invalid-feedback">
+										Last Name is required
+									</div>
+								</div>
+
+								<div class="mb-3">
 									<!-- <label class="mb-2 text-muted" for="email">E-Mail Address</label> -->
 									<input id="email" type="email" class="form-control" name="email" value="" placeholder="Email" required>
 									<div class="invalid-feedback">
