@@ -30,7 +30,6 @@ $("form#frmUpload").submit(function(e) {
 
             if(mes == "error") {
                 var error_message = parseJson.error_message;
-                // toastr.error(mes + " : " + error_message);
 
                 swal.fire({
                     icon: 'error',
@@ -39,7 +38,6 @@ $("form#frmUpload").submit(function(e) {
 
             }
             if(mes == "success") {
-                // toastr.info(mes + " Successfully Synced " );
 
                 swal.fire({
                     icon: 'success',
@@ -71,6 +69,7 @@ function loadList(company,source){
         pageLength: 15,
         'paging': true,
         "aaSorting": [],
+        "ordering": false,
         ajax: {
             url: "getSkus",
             type: 'POST',
@@ -112,34 +111,16 @@ function loadList(company,source){
 
 
 $(document).on('change', '#company', async function() {
-
-    // await ajaxSend($(this).val(), $('#source').val());
     myTable.destroy();
     loadList($(this).val(), $('#source').val());
-    
-    // console.log($(this).val())
-    // console.log($('#source').val())
 
 });
 
 
-async function ajaxSend(company, source){
-
-    const result = await
-
-    $.ajax({
-        url: "getSkus",
-        method: 'POST',
-        data: {
-            company: company,
-            source: source
-        }
-    });
-
-    return result;
-    
-}
-
+$(document).on('change', '#source', async function () {
+    myTable.destroy();
+    loadList($('#company').val() ,$(this).val());
+});
 
     
 

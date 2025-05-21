@@ -78,7 +78,7 @@
 
                                 <!-- <div class=""> -->
                                 <!-- <div class="card-body"> -->
-                                <table class="table table-responsive table-sm table-bordered text-nowrap" width="100%" id="tblData">
+                                <table class="table table-responsive table-sm table-hover table-bordered text-nowrap" width="100%" id="tblData">
                                     <thead>
                                         <tr>
                                             <th class="text-center">Product ID</th>
