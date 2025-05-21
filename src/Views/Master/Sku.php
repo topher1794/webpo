@@ -48,22 +48,26 @@
 
                                 <form method="post" action="">
 
-                                    <div id="toolbar">
+                                    <div id="toolbar" class="mb-4">
                                         <div class="row">
                                             <div class="md-2">
-                                                <label>To</label>
-                                                <select name="company" class="form-control form-select-sm">
+                                                <label>Comapny</label>
+                                                <select name="company" id="company" class="form-control form-select-sm">
                                                     <option>ROBERTS</option>
                                                     <option>URATEX</option>
                                                 </select>
                                             </div>
-                                            <div class="md-2">
-                                                <label>To</label>
-                                                <select name="company" class="form-control form-select-sm">
-                                                    <option>ROBERTS</option>
-                                                    <option>URATEX</option>
+                                            <div class="md-2 ml-2">
+                                                <label>Source</label>
+                                                <select name="source" id="source" class="form-control form-select-sm">
+                                                    <option>SHOPEE</option>
+                                                    <option>LAZADA</option>
                                                 </select>
                                             </div>
+                                            <!-- <div class="md-2 ml-2">
+                                                <label for=""></label>
+                                                <button>SEARCH</button>
+                                            </div> -->
 
                                         </div>
 
@@ -72,21 +76,24 @@
                                 </form>
 
 
-                                    <div class="responsive">
-                                        <table class="table table-head-fixed table-sm table-bordered dt-responsive text-nowrap" id="tblData">
-                                            <thead>
-                                                <tr>
-                                                    <th>Company </th>
-                                                    <th>Account Type </th>
-                                                    <th>Parent Sku </th>
-                                                    <th>Sku </th>
-                                                    <th>Product ID</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <!-- <div class=""> -->
+                                <!-- <div class="card-body"> -->
+                                <table class="table table-responsive table-sm table-bordered text-nowrap" width="100%" id="tblData">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Product ID</th>
+                                            <th class="text-center">Parent Sku </th>
+                                            <th class="text-center">Sku </th>
+                                            <th class="text-center">Product Name </th>
+                                            <th class="text-center">Account Type </th>
+                                            <th class="text-center">Company </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                                <!-- </div> -->
+                                <!-- </div> -->
 
                             </div>
                             <div class="card-footer">

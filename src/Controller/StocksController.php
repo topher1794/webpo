@@ -371,7 +371,7 @@ class StocksController extends Controller
             </Request>
         ";
 
-        $sql = "UPDATE StockAlignSync SET payload = ?  WHERE transactno = ? AND accttype = ?";
+        $sql = "UPDATE StockAlignSync SET payload = ? WHERE transactno = ? AND accttype = ?";
         $sql = $pdo->prepare($sql);
         $sql->execute([$xml, $transactId, 'LAZADA']);
 
@@ -383,7 +383,23 @@ class StocksController extends Controller
             // $response = $c->execute($request, $oldAccessToken);
 
             // $sql = "UPDATE StockAlignSync SET response = ?, synctime = current_timestamp, syncstatus = ? WHERE transactno = ? AND accttype = ?";
-            $sql = "UPDATE StockAlignSync sas INNER JOIN StockAlignTransact sat ON sas.transactno = sat.transactno SET sas.response = ?, sas.synctime = current_timestamp, sas.syncstatus = ?, sat.completedate = current_timestamp, sat.status = ? WHERE sas.transactno = ? AND sas.accttype = ?";
+            $sql = "UPDATE 
+                        StockAlignSync sas 
+                    INNER JOIN 
+                        StockAlignTransact sat 
+                    ON 
+                        sas.transactno = sat.transactno 
+                    SET 
+                        sas.response = ?
+                        ,sas.synctime = current_timestamp
+                        ,sas.syncstatus = ?
+                        ,sat.completedate = current_timestamp
+                        ,sat.status = ? 
+                    WHERE 
+                        sas.transactno = ? 
+                    AND 
+                        sas.accttype = ?
+            ";
             $sql = $pdo->prepare($sql);
             $sql->execute([$response, 'CLOSED', 'CLOSED', $transactId, 'LAZADA']);
         } catch (\Exception $e) {

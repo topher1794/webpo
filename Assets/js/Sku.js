@@ -61,10 +61,10 @@ $("form#frmUpload").submit(function(e) {
 
 
 $(function(){
-    loadList();
+    loadList(null,null);
 })
 
-function loadList(){
+function loadList(company,source){
 
     myTable = $('#tblData').DataTable({
         searching: true,
@@ -76,26 +76,72 @@ function loadList(){
             type: 'POST',
             data: {
                 "status": "Active",
+                company: company,
+                source: source
             }
         },
         columns: [
-            {
-                data: null,
-                render: function (data, type) {
-                    let atag = "viewCustomer?shipto=" + btoa(data.syncno);
-                    return '<a href="'+atag+'" >' + data.company + '</a>';
-                }
-            },
-            { data: 'accttype' },
+            
+            { data: 'productid' },
             { data: 'parentsku' },
             { data: 'sku' },
-            { data: 'productid' },
+            { data: 'productname' },
+            { data: 'accttype' },
+            {
+                data: 'company'
+                // render: function (data, type) {
+                //     let atag = "viewCustomer?shipto=" + btoa(data.syncno);
+                //     return '<a href="' + atag + '" >' + data + '</a>';
+                // }
+            },
 
         ],
+        "aoColumnDefs": [
+            { "bSortable": false, "aTargets": [0, 1, 2, 3, 4, 5] },
+            { "bSearchable": false, "aTargets": [0, 1, 2, 3, 4, 5] }
+        ],
+        columnDefs:[
+            {
+                targets: [3],
+                className: "text-center"
+            }
+        ]
     });
     
 }
 
+
+$(document).on('change', '#company', async function() {
+
+    // await ajaxSend($(this).val(), $('#source').val());
+    myTable.destroy();
+    loadList($(this).val(), $('#source').val());
+    
+    // console.log($(this).val())
+    // console.log($('#source').val())
+
+});
+
+
+async function ajaxSend(company, source){
+
+    const result = await
+
+    $.ajax({
+        url: "getSkus",
+        method: 'POST',
+        data: {
+            company: company,
+            source: source
+        }
+    });
+
+    return result;
+    
+}
+
+
+    
 
 
 
