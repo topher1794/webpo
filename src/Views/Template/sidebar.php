@@ -21,7 +21,7 @@
         </li>
 
         <li class="nav-item" id="li-dashboard">
-          <a href="modulecontrol?Dashboard&Home" class="nav-link" id="lia-dashboard" onclick="menuclick(this.id)">
+          <a href="dashboard" class="nav-link" id="lia-dashboard" onclick="menuclick(this.id)">
             <i class="fas fa-tachometer-alt nav-icon" aria-hidden="true"></i>
             <p>
               Dashboard
@@ -29,7 +29,7 @@
           </a>
         </li>
 
-        <li class="nav-item" id="li-dashboard">
+        <li class="nav-item" id="li-new">
           <a href="newsync" class="nav-link" id="lia-new" onclick="menuclick(this.id)">
             <i class="fas fa-upload nav-icon" aria-hidden="true"></i>
             <p>
@@ -40,7 +40,8 @@
 
         <li class="nav-item" id="li-request">
           <a href="#" class="nav-link" id="lia-request" onclick="menuclick(this.id)">
-            <i class="fa fa-list nav-icon" aria-hidden="true"></i>
+            <!-- <i class="fa fa-list nav-icon" aria-hidden="true"></i> -->
+            <i class="fas fa-clipboard-list nav-icon" aria-hidden="true"></i>
             <p>
               Transaction Logs
               <i class="fas fa-angle-left right"></i>
@@ -65,14 +66,15 @@
 
         <li class="nav-item" id="li-dashboard">
           <a href="sku" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
-            <i class="fas fa-list nav-icon" aria-hidden="true"></i>
+            <!-- <i class="fas fa-list nav-icon" aria-hidden="true"></i> -->
+            <i class="fas fa-th-list nav-icon" aria-hidden="true"></i>
             <p>
               Masterlist
             </p>
           </a>
         </li>
 
-         <li class="nav-item" id="li-dashboard">
+        <li class="nav-item" id="li-dashboard">
           <a href="users" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
             <i class="fas fa-user nav-icon" aria-hidden="true"></i>
             <p>
@@ -80,7 +82,7 @@
             </p>
           </a>
         </li>
-        
+
         <li class="nav-item" id="li-dashboard">
           <a target="_blank" href="swaggerapi" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
             <i class="fa fa-code nav-icon" aria-hidden="true"></i>

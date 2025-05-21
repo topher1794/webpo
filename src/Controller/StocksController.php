@@ -92,14 +92,14 @@ class StocksController extends Controller
         $materialcode = $_POST["materialcode"] ?? "";
         $company = $_POST["company"] ?? "";
         $userid = "";
-        $empname ="";
+        $empname = "";
 
         $arrayData = array(
-            "materialcode" => $materialcode
-            ,"company" => $company
-            ,"userid" => $userid
-            ,"source" => "form"
-            ,"empname" => $empname
+            "materialcode" => $materialcode,
+            "company" => $company,
+            "userid" => $userid,
+            "source" => "form",
+            "empname" => $empname
         );
         $this->syncStockQty($arrayData);
     }
@@ -112,23 +112,25 @@ class StocksController extends Controller
         $empname = $_SESSION["empname"];
 
         $arrayData = array(
-            "materialcode" => $materialcode
-            ,"company" => $company
-            ,"userid" => $userid
-            ,"source" => "form"
-            ,"empname" => $empname
+            "materialcode" => $materialcode,
+            "company" => $company,
+            "userid" => $userid,
+            "source" => "form",
+            "empname" => $empname
         );
+
         $this->syncStockQty($arrayData);
     }
 
 
-    public function syncStockQty(array $arrayData){
+    public function syncStockQty(array $arrayData)
+    {
         $materialcode = $arrayData["materialcode"];
         $userid = $arrayData["userid"];
         $empname = $arrayData["empname"];
         $company = $arrayData["company"];
 
-         $stockQty = $this->getStocks($materialcode);
+        $stockQty = $this->getStocks($materialcode);
 
         if (empty($stockQty)) {
             echo json_encode(array("result" => "error", "message" => "Material code not found"));
@@ -196,10 +198,9 @@ class StocksController extends Controller
         $stmtUuid->execute();
         $uuid = $stmtUuid->fetch();
 
-        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, company, userid, status, source)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? , ?) ";
+        $sql = "INSERT INTO StockAlignTransact(transactno, inputdate, materialcode, company, userid, status, source)VALUES(?, CURRENT_TIMESTAMP(), ?, ?, ? , ?, ?) ";
         $statement = $pdo->prepare($sql);
         $statement->execute([$uuid["uuid"], $materialcode, $company, $userid, "OPEN", $source]);
-
 
         try {
             $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
@@ -265,28 +266,29 @@ class StocksController extends Controller
                 $jsonQty = $this->getStocksFromShopee($shopeeID);
                 $jsonDecodeShopee = json_decode($jsonQty, true);
             }
-                $model = $jsonDecodeShopee["response"]["model"];
-                foreach($model as $i => $val) {
-                    $valModelId = $val["model_id"];
-                    if($valModelId == $shopee["skuid"]) {
-                        $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
-                        $sql = "UPDATE StockAlignSync SET orig_qty = ? WHERE transactno= ? and accttype = 'SHOPEE'";
-                        $statement = $pdo->prepare($sql);
-                        $statement->execute([
-                            $shopeeStock, $uuid["uuid"]
-                        ]);
-                        break;
-                    }
+            $model = $jsonDecodeShopee["response"]["model"];
+            foreach ($model as $i => $val) {
+                $valModelId = $val["model_id"];
+                if ($valModelId == $shopee["skuid"]) {
+                    $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                    $sql = "UPDATE StockAlignSync SET orig_qty = ? WHERE transactno= ? and accttype = 'SHOPEE'";
+                    $statement = $pdo->prepare($sql);
+                    $statement->execute([
+                        $shopeeStock,
+                        $uuid["uuid"]
+                    ]);
+                    break;
                 }
+            }
         }
 
         //check lazada token | qty
-        $lazadaStock= 0;
+        $lazadaStock = 0;
         $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
         if (isset($jsonDecodeLazada)) {
-             if (isset($jsonDecodeLazada["message"]) && strpos($jsonDecodeLazada["message"], "A facade root has not been set") !== false) {
+            if (isset($jsonDecodeLazada["message"]) && strpos($jsonDecodeLazada["message"], "A facade root has not been set") !== false) {
                 $this->refreshLazadaToken();
-                 $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+                $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
             }
             $qty = $jsonDecodeLazada['data']['skus'];
             for ($x = 0; $x < count($qty); $x++) {
@@ -298,15 +300,13 @@ class StocksController extends Controller
             $sql = "UPDATE StockAlignSync SET orig_qty = ?  WHERE transactno = ? AND accttype = ?";
             $sql = $pdo->prepare($sql);
             $sql->execute([$lazadaStock,  $uuid["uuid"], 'LAZADA']);
-
-
         }
- 
 
 
 
-        $shopeeQty = 7;//ORIGINAL
-        $lazadaQty = 2;//ORIGINAL
+
+        $shopeeQty = 7; //ORIGINAL
+        $lazadaQty = 3; //ORIGINAL
         $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
         $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
     }
@@ -330,7 +330,7 @@ class StocksController extends Controller
         $sql->execute([$transactId, 'LAZADA']);
         $productID = $sql->fetch();
 
-      
+
 
 
         $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ? AND sku = ?";
@@ -381,14 +381,15 @@ class StocksController extends Controller
             $request->addApiParam('payload', $xml);
             $response = $c->execute($request, $lazadaVal['access_token']);
             // $response = $c->execute($request, $oldAccessToken);
+
+            // $sql = "UPDATE StockAlignSync SET response = ?, synctime = current_timestamp, syncstatus = ? WHERE transactno = ? AND accttype = ?";
+            $sql = "UPDATE StockAlignSync sas INNER JOIN StockAlignTransact sat ON sas.transactno = sat.transactno SET sas.response = ?, sas.synctime = current_timestamp, sas.syncstatus = ?, sat.completedate = current_timestamp, sat.status = ? WHERE sas.transactno = ? AND sas.accttype = ?";
+            $sql = $pdo->prepare($sql);
+            $sql->execute([$response, 'CLOSED', 'CLOSED', $transactId, 'LAZADA']);
         } catch (\Exception $e) {
             print_r($e);
         }
 
-
-        $sql = "UPDATE StockAlignSync SET response = ?, synctime = current_timestamp WHERE transactno = ? AND accttype = ?";
-        $sql = $pdo->prepare($sql);
-        $sql->execute([$response, $transactId, 'LAZADA']);
 
         return true;
     }
@@ -413,11 +414,11 @@ class StocksController extends Controller
             $request->addApiParam('seller_sku', $sku);
             $result = $c->execute($request, $access_token);
             $json = json_decode($result, true);
-            
 
-  
+
+
             // return $origQty;
-             
+
 
         } catch (\Exception $e) {
             // print_r($e->getMessage());
@@ -426,7 +427,6 @@ class StocksController extends Controller
             $json = array("message" => "A facade root has not been set");
         }
         return $json;
-
     }
 
     public function refreshLazadaToken()
@@ -647,13 +647,12 @@ class StocksController extends Controller
             $error = curl_error($ch);
             curl_close($ch);
 
-          
+
             $response = json_decode($response, true);
 
 
             $sql = $pdo->prepare("UPDATE StockAlignSettings SET `attributes` = JSON_SET(`attributes`, '$.access_token', ?, '$.refresh_token', ?) WHERE settingstype = ?");
             $sql->execute([$response['access_token'], $response['refresh_token'], 'rob_shopee_value']);
-
         } catch (\Exception $e) {
             print_r($e);
         }
