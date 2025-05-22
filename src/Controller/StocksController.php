@@ -778,8 +778,16 @@ class StocksController extends Controller
         $draw = $_POST['draw'] ?? 1;
         $start = $_POST['start'] ?? 1;
         $length = $_POST['length'] ?? 1;
+        $concat = "";
+
+        $from = $_POST['from'] ?? "";
+        $to = $_POST['to'] ?? "";
 
         $page = $_POST['page'] ?? "";
+
+        if (!empty($from) && !empty($to)) {
+            $concat = "AND (DATE(inputdate) BETWEEN '" . $from . "' AND '" . $to . "')";
+        }
 
         $sql = "SELECT 
                     inputdate
@@ -799,6 +807,7 @@ class StocksController extends Controller
                     StockAlignTransact 
                 WHERE 
                     status = '" . $page . "'
+                    " . $concat . "
                 ORDER BY
                     inputdate DESC
                     ";

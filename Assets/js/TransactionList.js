@@ -1,4 +1,5 @@
-
+import ClsAsync from './ClsAsync.js';
+var myTable = "";
 $(function () {
     loadList();
 })
@@ -39,7 +40,7 @@ function loadList() {
 
     columnDefs = [{ targets: columnDefsVal, className: 'text-center' }];
 
-    $('#tblData').DataTable({
+    myTable = $('#tblData').DataTable({
         searching: true,
         pageLength: 15,
         'paging': true,
@@ -51,7 +52,9 @@ function loadList() {
             type: 'POST',
             data: {
                 "status": "Active",
-                "page": $page
+                "page": $page,
+                "from": $('#from').val(),
+                "to": $('#to').val()
             }
         },
         columns: columns,
@@ -75,15 +78,17 @@ $(document).on('click', 'a.transactNo', async function () {
 
     let tableData = "";
 
+    $('#exampleModalLabel').text(myData[0])
+
     for (let x = 0; x < myJson_val.length; x++) {
         tableData += "<tr>";
         tableData += "<td>" + myJson_val[x]['accttype'] + "</td>";
         tableData += "<td>" + myJson_val[x]['productid'] + "</td>";
         tableData += "<td>" + myJson_val[x]['materialcode'] + "</td>";
         tableData += "<td>" + (myJson_val[x]['modelid'] == null ? '' : myJson_val[x]['modelid']) + "</td>";
-        tableData += "<td>" + myJson_val[x]['productname'] + "</td>";
-        tableData += "<td>" + myJson_val[x]['qty'] + "</td>";
-        tableData += "<td>" + (myJson_val[x]['orig_qty'] == null ? '' : myJson_val[x]['orig_qty']) + "</td>";
+        tableData += "<td title=\"" + myJson_val[x]['productname'] + "\">" + (myJson_val[x]['productname'].length <= 40 ? myJson_val[x]['productname'] : myJson_val[x]['productname'].substring(0, 40) + "...") + "</td>";
+        tableData += "<td class=\"text-center\">" + myJson_val[x]['qty'] + "</td>";
+        tableData += "<td class=\"text-center\">" + (myJson_val[x]['orig_qty'] == null ? '' : myJson_val[x]['orig_qty']) + "</td>";
         tableData += "</tr>";
     }
 
@@ -91,6 +96,51 @@ $(document).on('click', 'a.transactNo', async function () {
 
     $('#exampleModal').modal('show')
 })
+
+$(document).on('click', '#btnSearch', function (e) {
+    e.preventDefault();
+    let from = $('#from').val();
+    let to = $('#to').val();
+
+    console.log('ASASAJSASJHSA' + to)
+
+    if (from == '' && to == '') {
+        Swal.fire({
+            title: "Invalid Date Range",
+            text: "Please fill up date range!",
+            icon: "warning",
+            allowOutsideClick: false
+        });
+        return;
+    } else {
+        myTable.destroy();
+        loadList();
+    }
+})
+
+
+$(document).on('click', '#btnDelete', function () {
+    $('#from').val('');
+    $('#to').val('');
+})
+
+$(document).on('click', '#newSync', function () {
+    $('#newSyncModal').modal('show');
+})
+
+
+$(document).on('click', '#btnSubmit', async function () {
+    let frmData = $("#frmData").serializeArray();
+    // frmData.push(
+    //     { name: 'salesorg', value: company }
+    // );
+    let url = "syncviaform";
+    let result = await clsSync.getAjaxAsync(url, 'POST', frmData);
+    console.log(result);
+
+
+});
+
 
 async function ajaxSend(url, method, data) {
 

@@ -177,7 +177,7 @@ class MasterController extends Controller
         $start = $_POST['start'] ?? 1;
         $length = $_POST['length'] ?? 1;
 
-        $sql = "select id, firstname, lastname, username, emailadd, token, token_expiration,  status from StockAlignUsers ORDER BY firstname, lastname asc    ";
+        $sql = "select id, CONCAT(firstname, ' ',lastname) as name, username, emailadd, token, token_expiration,  status from StockAlignUsers ORDER BY firstname, lastname asc    ";
         $stmt = $pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

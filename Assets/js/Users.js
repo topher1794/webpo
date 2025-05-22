@@ -5,11 +5,11 @@ var clsSync = new ClsAsync('test');
 var myTable = "";
 
 
-$(function(){
+$(function () {
     loadList();
 })
 
-function loadList(){
+function loadList() {
 
     myTable = $('#tblData').DataTable({
         searching: true,
@@ -27,8 +27,8 @@ function loadList(){
             {
                 data: null,
                 render: function (data, type) {
-                    let atag = "viewCustomer?shipto=" + btoa(data.firstname );
-                    return '<a href="'+atag+'" >' + (data.firstname + " "  + data.lastname)+ '</a>';
+                    // let atag = "viewCustomer?shipto=" + btoa(data.firstname);
+                    return (data.name == null ? '' : data.name);
                 }
             },
             { data: 'emailadd' },
@@ -37,7 +37,7 @@ function loadList(){
             { data: 'status' },
         ],
     });
-    
+
 }
 
 
