@@ -4,8 +4,6 @@
     <section class="content">
 
         <div class="container-fluid">
-
-
             <div class="row mt-4">
 
                 <div class="col-12">
@@ -46,16 +44,17 @@
 
 
                             <div class="responsive">
-                                <table class="table table-head-fixed table-sm table-bordered dt-responsive text-nowrap" id="tblData">
+                                <table class="table table-head-fixed table-sm table-bordered dt-responsive text-nowrap" width="100%" id="tblData">
                                     <thead>
                                         <tr>
                                             <!-- <th data-sortable="true"><input id="select-all" type="checkbox" /> Transaction Number</th> -->
                                             <th class="text-center">Transaction Number </th>
-                                            <th class="text-center"> Account Name </th>
-                                            <th class="text-center"> Account Type </th>
-                                            <th class="text-center"> Input Time </th>
-                                            <th class="text-center"> File Type </th>
-                                            <th class="text-center"> Response </th>
+                                            <th class="text-center"> Sync Date </th>
+                                            <th class="text-center"> SKU </th>
+                                            <th class="text-center"> Company </th>
+                                            <th class="text-center"> Source </th>
+                                            <th class="text-center"> User </th>
+                                            <th class="text-center" <?= $_GET['status'] == 'Open' ? 'hidden' : '' ?>> Date Completed </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -73,6 +72,44 @@
 
 
 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <table class="table table-sm table-hover table-bordered table-responsive text-nowrap" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>E-commerce</th>
+                                        <th>Product ID</th>
+                                        <th>SKU</th>
+                                        <th>Model ID</th>
+                                        <th>Product Name</th>
+                                        <th>QTY</th>
+                                        <th>Orig. QTY</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="Mtbody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class=" modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>

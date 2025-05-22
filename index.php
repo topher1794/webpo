@@ -30,6 +30,7 @@ $router->get('/getAccessToken', stockalignment\Controller\StocksController::clas
 $router->get('/getAccessTokenLazada', stockalignment\Controller\StocksController::class, 'getAccessTokenLazada');
 $router->get('/refreshLazadaToken', stockalignment\Controller\StocksController::class, 'refreshLazadaToken');
 $router->get('/getLazadaItem', stockalignment\Controller\StocksController::class, 'getLazadaItem');
+$router->post('/getDetails', stockalignment\Controller\StocksController::class, 'getDetails');
 
 $router->get('/registration', stockalignment\Controller\RegistrationController::class, 'registration');
 $router->post('/newRegistration', stockalignment\Controller\RegistrationController::class, 'newRegistration');
@@ -71,7 +72,7 @@ $router->get('/swaggerapi', stockalignment\Controller\StocksController::class, '
 
 /**
  * Users
-*/
+ */
 
 $router->get('/users', stockalignment\Controller\MasterController::class, 'userlists');
 $router->post('/getUsers', stockalignment\Controller\MasterController::class, 'getUsers');

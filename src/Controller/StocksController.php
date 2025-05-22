@@ -781,11 +781,27 @@ class StocksController extends Controller
 
         $page = $_POST['page'] ?? "";
 
-        $sql = "SELECT transactno, syncno, accttype, materialcode, productid, qty, syncstatus, payload, response, synctime, (SELECT productname FROM StockAlignSku WHERE productid = StockAlignSync.productid LIMIT 1) as acctName
-        FROM 
-        StockAlignSync WHERE syncstatus = '" . $page . "'
-        ";
-
+        $sql = "SELECT 
+                    inputdate
+                    ,transactno
+                    ,materialcode
+                    ,company
+                    ,source
+                    ,(SELECT 
+                        CONCAT(firstname, ' ',lastname) as Name 
+                    FROM 
+                        StockAlignUsers 
+                    WHERE 
+                        id = '" . $_SESSION['userno'] . "'
+                    ) as user
+                    ,completedate 
+                FROM 
+                    StockAlignTransact 
+                WHERE 
+                    status = '" . $page . "'
+                ORDER BY
+                    inputdate DESC
+                    ";
         $stmt = $pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -937,6 +953,50 @@ class StocksController extends Controller
         $sql->execute();
         $values = $sql->fetch();
         return json_decode($values['attributes'], true);
+    }
+
+    public function getDetails()
+    {
+        $pdo = $this->database->getPdo();
+
+        $transactNo = $_POST['transactNo'] ?? "";
+        $sku = $_POST['sku'] ?? "";
+        $draw = $_POST['draw'] ?? 1;
+
+
+        $sql = "SELECT 
+                    accttype
+                    ,productid
+                    ,materialcode
+                    ,modelid
+                    ,(SELECT 
+                        productname 
+                    FROM 
+                        StockAlignSku 
+                    WHERE 
+                        sku = ? 
+                    LIMIT 1
+                    ) as productname
+                    ,qty
+                    ,orig_qty 
+                FROM
+                    StockAlignSync
+                WHERE
+                    transactno = ?";
+
+        $sql = $pdo->prepare($sql);
+        $sql->execute([$sku, $transactNo]);
+        $data = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+
+        $rowCount = count($data);
+        $json_data = array(
+            "draw"            =>  $draw,
+            "recordsTotal"    => intval($rowCount),
+            "recordsFiltered" => intval($rowCount),
+            "data"            => $data
+        );
+        echo json_encode($json_data, JSON_PRETTY_PRINT);
     }
 
 

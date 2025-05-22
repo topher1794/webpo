@@ -382,7 +382,7 @@ class AuthenticationController extends Controller
 
             if (password_verify($password, $stored_hash)) {
                 // Process $results
-                $_SESSION["userno"] = $email;
+                $_SESSION["userno"] = $user['id'];
                 $response = ['status' => 'success', 'message' => 'Login successful'];
                 header('Content-Type: application/json');
                 echo json_encode($response);
@@ -580,7 +580,7 @@ class AuthenticationController extends Controller
 
         $rowCount = $statement->rowCount();
 
-        if($rowCount == 0) {
+        if ($rowCount == 0) {
             http_response_code(400);
             echo json_encode(["message" => "Access Token not found."], JSON_PRETTY_PRINT);
             exit();
