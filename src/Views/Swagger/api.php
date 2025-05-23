@@ -18,7 +18,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Stock Alignment API",
-    "description": "To acquire a bearer token, navigate to https://www.base64encode.org/ and enter your company email address. Subsequently, copy the generated output and utilize it for bearer authentication.\n"
+    "description": "To acquire a bearer token, navigate to https://www.base64encode.org/ and enter your username and password. Example: `username:password`. Convert it to base64 format. Subsequently, copy the generated output and utilize it for bearer authentication.\n"
   },
   "host": "intra.uratex.com.ph/stockalignproj/",
   "schemes": [
@@ -29,7 +29,7 @@
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
-      "description": "Enter the token with the `Bearer: ` value must be combination of username and password in base64 encoded format."
+      "description": "Enter the token with the `Bearer: ` value must be combination of username and password in base64 encoded format. Ex. username:password"
     }
   },
   "paths": {

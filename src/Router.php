@@ -41,8 +41,9 @@ class Router
         $uri = strtok($_SERVER['REQUEST_URI'], '?');
         $method =  $_SERVER['REQUEST_METHOD'];
 
+        $host= $_SERVER['HTTP_HOST'];
         $BASE_URL_QAS = "";
-        if (strpos($uri, "_qas") !== FALSE) {
+        if (strpos($uri, "_qas") !== FALSE || strpos($uri, "localhost") !== FALSE) {
             $BASE_URL_QAS = "_qas";
         }
 
@@ -56,7 +57,6 @@ class Router
         if (array_key_exists($uri, $this->routes[$method])) {
             $controller = $this->routes[$method][$uri]['controller'];
             $action = $this->routes[$method][$uri]['action'];
-
 
 
             /**

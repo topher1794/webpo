@@ -63,7 +63,7 @@ class AuthenticationController extends Controller
         $pdo = $this->database->getPdo();
 
 
-        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password FROM StockAlignUsers WHERE username = :username");
+        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, firstname, lastname, company FROM StockAlignUsers WHERE username = :username");
         $stmt->bindParam(':username', $email);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
