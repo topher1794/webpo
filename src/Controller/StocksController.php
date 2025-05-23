@@ -82,36 +82,129 @@ class StocksController extends Controller
 
     public function checkstockqty() {
         $materialcode = $_POST["materialcode"] ??"";
+        $company = $_POST["company"] ??"";
 
         if(empty($materialcode)) {
             echo "<tr>Material Code is empty</tr><tr></tr>";
             exit();
         }
+         if(empty($company)) {
+            echo "<tr>Company is empty</tr><tr></tr>";
+            exit();
+        }
         //sap qty
 
+        $returnTr = "";
 
         $pdo = $this->database->getPdo();
 
+        $compPrefix = strtolower($company);
+        $compPrefix = substr($compPrefix, 0 , 3);
 
-        // $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . $settingsVal . "'";
-        // $sql = $pdo->prepare($sql);
-        // $sql->execute();
-        // $values = $sql->fetch();
 
-        $sapQty = $this->getStocks($materialcode);
 
-        $stockArr = explode("<br>", $sapQty);
-        print_r($stockArr);
+
+        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . ($compPrefix. "_settings"). "'";
+        $sql = $pdo->prepare($sql);
+        $sql->execute();
+        $values = $sql->fetch();
+
+        $plantwhse = "";
+        if(isset($values)) {
+            $json = json_decode( $values["attributes"] ) ;
+            $plantwhse = $json->plantwhse ;
+        }
+
         $sQty = 0.0;
-        foreach ($stockArr as $arr) {
-            $arrData = explode("|", $arr);
-            $qty = $arrData[2];
-            $qty = trim($qty);
-            $sQty += (float) $qty;
+        if(!empty($plantwhse)) {
+             $sapQty = $this->getStocks($materialcode);
+            $stockArr = explode("<br>", $sapQty);
+            foreach ($stockArr as $arr) {
+                $arrayPlantWhse = explode("|", $plantwhse);
+                $arrData = explode("|", $arr);
+                $plant = $arrData[0];
+                    $plant = trim($plant);
+                $whse = $arrData[1];
+                    $whse = trim($whse);
+                
+                $attrPlant =  $arrayPlantWhse[0];
+                $attrWhse =  $arrayPlantWhse[1];
+
+                if($plant == $attrPlant && $whse == $attrWhse) {
+                     $qty = $arrData[2];
+                    $qty = trim($qty);
+                    $sQty += (float) $qty;
+                }
+            }
         }
 
 
-        echo $sQty;
+        $returnTr .= '<tr><td>SAP</td><td><span class="badge bg-primary">'.$sQty.'</span></td></tr>';
+       
+
+        try {
+            $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+            $stmtShopee->execute([$company, $materialcode]);
+            $stmtShopee->execute();
+            $shopee = $stmtShopee->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            print_r($e);
+        }
+
+
+        $shopeeID = $shopee["productid"];
+
+        // check shopee token | qty
+        $shopeeStock = 0;
+        $jsonQty = $this->getStocksFromShopee($shopeeID);
+        $jsonDecodeShopee = json_decode($jsonQty, true);
+        if (isset($jsonDecodeShopee["message"])) {
+            if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
+                $this->refreshShopeeToken();
+                //set when expired
+                $jsonQty = $this->getStocksFromShopee($shopeeID);
+                $jsonDecodeShopee = json_decode($jsonQty, true);
+            }
+            $model = $jsonDecodeShopee["response"]["model"];
+            foreach ($model as $i => $val) {
+                $valModelId = $val["model_id"];
+                if ($valModelId == $shopee["skuid"]) {
+                    $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                    break;
+                }
+            }
+        }
+
+        $returnTr .= '<tr><td>SHOPEE</td><td><span class="badge bg-warning">'.$shopeeStock.'</span></td></tr>';
+
+
+
+        $stmtLazada = $pdo->prepare("SELECT productid FROM StockAlignSku WHERE accttype='LAZADA' AND company = ? AND COALESCE(sku, parentsku) = ?");
+        $stmtLazada->execute([$company, $materialcode]);
+        $lazada = $stmtLazada->fetch(PDO::FETCH_ASSOC);
+
+        $lazadaID = $lazada["productid"];
+        //check lazada token | qty
+        $lazadaStock = 0;
+        $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+        if (isset($jsonDecodeLazada)) {
+            if (isset($jsonDecodeLazada["message"]) && strpos($jsonDecodeLazada["message"], "A facade root has not been set") !== false) {
+                $this->refreshLazadaToken();
+                $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+            }
+            $qty = $jsonDecodeLazada['data']['skus'];
+            for ($x = 0; $x < count($qty); $x++) {
+                if ($qty[$x]['SellerSku'] == $materialcode) {
+                    $lazadaStock = $qty[$x]['multiWarehouseInventories'][0]['sellableQuantity'];
+                    break;
+                }
+            }
+        }
+        $returnTr .= '<tr><td>LAZADA</td><td><span class="badge bg-info">'.$lazadaStock.'</span></td></tr>';
+
+        echo $returnTr;
+
+
 
     }
 
@@ -235,46 +328,86 @@ class StocksController extends Controller
         $empname = $arrayData["empname"];
         $company = $arrayData["company"];
 
-        print_r($materialcode);
         if (empty($materialcode)) {
             echo json_encode(array("result" => "error", "message" => "Material code is empty."));
             exit();
         }
 
-        $stockQty = $this->getStocks($materialcode);
-
-        if (empty($stockQty)) {
-            echo json_encode(array("result" => "error", "message" => "Material code not found"));
+        if (empty($company)) {
+            echo json_encode(array("result" => "error", "message" => "Company is empty."));
             exit();
         }
 
-        $stockArr = explode("<br>", $stockQty);
+
+        $pdo = $this->database->getPdo();
+
+        $compPrefix = strtolower($company);
+        $compPrefix = substr($compPrefix, 0 , 3);
+
+
+        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . ($compPrefix. "_settings"). "'";
+        $sql = $pdo->prepare($sql);
+        $sql->execute();
+        $values = $sql->fetch();
+
+        $plantwhse = "";
+
+        $percentageShopee = 0; 
+        $percentageLazada = 0; 
+
+        if(isset($values)) {
+            $json = json_decode( $values["attributes"] ) ;
+            $plantwhse = $json->plantwhse ;
+            $percentageShopee = $json->shopee ;
+            $percentageLazada = $json->lazada ;
+        }
+        if (empty($plantwhse)) {
+            echo json_encode(array("result" => "error", "message" => "Plant Warehouse is empty."));
+            exit();
+        }
+        if (empty($percentageShopee) || $percentageShopee == 0) {
+            echo json_encode(array("result" => "error", "message" => "Shopee allocation is empty."));
+            exit();
+        }
+
         $sQty = 0.0;
-        foreach ($stockArr as $arr) {
-            $arrData = explode("|", $arr);
-            $qty = $arrData[2];
-            $qty = trim($qty);
-            $sQty += (float) $qty;
-        }
-        if (empty($stockQty)) {
-            echo json_encode(array("result" => "error", "message" => "No quantity found"));
-            exit();
+        if(!empty($plantwhse)) {
+             $sapQty = $this->getStocks($materialcode);
+            if (empty($sapQty)) {
+                echo json_encode(array("result" => "error", "message" => "No quantity found"));
+                exit();
+            }
+
+            $stockArr = explode("<br>", $sapQty);
+            foreach ($stockArr as $arr) {
+                $arrayPlantWhse = explode("|", $plantwhse);
+                $arrData = explode("|", $arr);
+                $plant = $arrData[0];
+                    $plant = trim($plant);
+                $whse = $arrData[1];
+                    $whse = trim($whse);
+                
+                $attrPlant =  $arrayPlantWhse[0];
+                $attrWhse =  $arrayPlantWhse[1];
+
+                if($plant == $attrPlant && $whse == $attrWhse) {
+                     $qty = $arrData[2];
+                    $qty = trim($qty);
+                    $sQty += (float) $qty;
+                }
+            }
         }
 
-
-        $shopeeQty = $sQty * .65;
+        if($percentageShopee < $percentageLazada) {
+            $percentageShopee = $percentageLazada;
+        }
+        
+        $percentageShopee = $percentageShopee / 100;
+        $shopeeQty = $sQty * $percentageShopee;
         $shopeeQty =  ceil($shopeeQty);
+
+        //Lazada
         $lazadaQty =  $sQty - $shopeeQty;
-
-
-        // $data = array(
-        //     "userid" => $userid,
-        //     "empname" => $empname,
-        //     "materialcode" => $materialcode,
-        //     "company" => $company,
-        //     "shopee" => $shopeeQty,
-        //     "lazada" => $lazadaQty,
-        // );
 
         $arrayData["shopee"] = $shopeeQty;
         $arrayData["lazada"] = $lazadaQty;

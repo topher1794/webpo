@@ -73,6 +73,10 @@
   <?php if (in_array($action, array("logs"))) { ?>
     <script type="module"  src="Assets/js/TransactionList.js"></script>
   <?php } ?>
+  <?php if (in_array($action, array("checkstock"))) { ?>
+    <script type="module"  src="Assets/js/CheckStock.js"></script>
+  <?php } ?>
+
 <?php } ?>
 
 
@@ -84,6 +88,7 @@
   <?php if (in_array($action, array("users"))) { ?>
     <script type="module"  src="Assets/js/Users.js"></script>
   <?php } ?>
+
 
   
 <?php } ?>
