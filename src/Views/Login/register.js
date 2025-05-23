@@ -12,8 +12,6 @@ $(document).on('submit', '#registerFrm', async (e) => {
         myObject[key] = value;
     }
 
-    console.log(myObject);
-
     fetchData('newRegistration', 'POST', myObject)
         .then(createdUser => {
             console.log(createdUser)
@@ -27,6 +25,12 @@ $(document).on('submit', '#registerFrm', async (e) => {
                     break;
                 case 201:
                     alert(createdUser.message, 'success');
+                    $('#username').val('');
+                    $('#firstname').val('');
+                    $('#lastname').val('');
+                    $('#email').val('');
+                    $('#password').val('');
+                    $('#confirm-password').val('');
                 default:
                     createdUser.status
             }
