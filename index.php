@@ -5,6 +5,16 @@ use stockalignment\Router;
 
 require_once realpath("vendor/autoload.php");
 
+/**
+ * DEFINING SET-UP HERE
+ */
+$uri = strtok($_SERVER['REQUEST_URI'], '?');
+$host = $_SERVER['HTTP_HOST'];
+$SUFFIX_QAS = "";
+if (strpos($host, "_qas") !== FALSE || strpos($host, "localhost") !== FALSE) {
+    $SUFFIX_QAS = "_qas";
+}
+
 
 error_reporting(0);
 ob_start();
@@ -87,9 +97,9 @@ $router->post('/apirefreshtokenv1', stockalignment\Controller\AuthenticationCont
 
 /**
  * Stock Checking
-*/
+ */
 $router->get('/checkstock', stockalignment\Controller\StocksController::class, 'checkstock');
 $router->post('/checkstockqty', stockalignment\Controller\StocksController::class, 'checkstockqty');
- 
+
 
 $router->dispatch();
