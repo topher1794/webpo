@@ -29,7 +29,7 @@
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
-      "description": "Enter the token with the `Bearer: ` value must be combination of username and password in base64 encoded format."
+      "description": "Enter the token with the `Bearer: ` value must be combination of username and password in base64 encoded format. Ex.username:password"
     }
   },
   "paths": {
