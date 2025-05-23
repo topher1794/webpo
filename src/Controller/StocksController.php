@@ -80,15 +80,16 @@ class StocksController extends Controller
         $this->render('Template/footer.php', $data);
     }
 
-    public function checkstockqty() {
-        $materialcode = $_POST["materialcode"] ??"";
-        $company = $_POST["company"] ??"";
+    public function checkstockqty()
+    {
+        $materialcode = $_POST["materialcode"] ?? "";
+        $company = $_POST["company"] ?? "";
 
-        if(empty($materialcode)) {
+        if (empty($materialcode)) {
             echo "<tr>Material Code is empty</tr><tr></tr>";
             exit();
         }
-         if(empty($company)) {
+        if (empty($company)) {
             echo "<tr>Company is empty</tr><tr></tr>";
             exit();
         }
@@ -99,39 +100,39 @@ class StocksController extends Controller
         $pdo = $this->database->getPdo();
 
         $compPrefix = strtolower($company);
-        $compPrefix = substr($compPrefix, 0 , 3);
+        $compPrefix = substr($compPrefix, 0, 3);
 
 
 
 
-        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . ($compPrefix. "_settings"). "'";
+        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . ($compPrefix . "_settings") . "'";
         $sql = $pdo->prepare($sql);
         $sql->execute();
         $values = $sql->fetch();
 
         $plantwhse = "";
-        if(isset($values)) {
-            $json = json_decode( $values["attributes"] ) ;
-            $plantwhse = $json->plantwhse ;
+        if (isset($values)) {
+            $json = json_decode($values["attributes"]);
+            $plantwhse = $json->plantwhse;
         }
 
         $sQty = 0.0;
-        if(!empty($plantwhse)) {
-             $sapQty = $this->getStocks($materialcode);
+        if (!empty($plantwhse)) {
+            $sapQty = $this->getStocks($materialcode);
             $stockArr = explode("<br>", $sapQty);
             foreach ($stockArr as $arr) {
                 $arrayPlantWhse = explode("|", $plantwhse);
                 $arrData = explode("|", $arr);
                 $plant = $arrData[0];
-                    $plant = trim($plant);
+                $plant = trim($plant);
                 $whse = $arrData[1];
-                    $whse = trim($whse);
-                
+                $whse = trim($whse);
+
                 $attrPlant =  $arrayPlantWhse[0];
                 $attrWhse =  $arrayPlantWhse[1];
 
-                if($plant == $attrPlant && $whse == $attrWhse) {
-                     $qty = $arrData[2];
+                if ($plant == $attrPlant && $whse == $attrWhse) {
+                    $qty = $arrData[2];
                     $qty = trim($qty);
                     $sQty += (float) $qty;
                 }
@@ -139,8 +140,8 @@ class StocksController extends Controller
         }
 
 
-        $returnTr .= '<tr><td>SAP</td><td><span class="badge bg-primary">'.$sQty.'</span></td></tr>';
-       
+        $returnTr .= '<tr><td>SAP</td><td><span class="badge bg-primary">' . $sQty . '</span></td></tr>';
+
 
         try {
             $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
@@ -156,13 +157,13 @@ class StocksController extends Controller
 
         // check shopee token | qty
         $shopeeStock = 0;
-        $jsonQty = $this->getStocksFromShopee($shopeeID);
+        $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix);
         $jsonDecodeShopee = json_decode($jsonQty, true);
         if (isset($jsonDecodeShopee["message"])) {
             if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
-                $this->refreshShopeeToken();
+                $this->refreshShopeeToken($compPrefix);
                 //set when expired
-                $jsonQty = $this->getStocksFromShopee($shopeeID);
+                $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix);
                 $jsonDecodeShopee = json_decode($jsonQty, true);
             }
             $model = $jsonDecodeShopee["response"]["model"];
@@ -175,7 +176,7 @@ class StocksController extends Controller
             }
         }
 
-        $returnTr .= '<tr><td>SHOPEE</td><td><span class="badge bg-warning">'.$shopeeStock.'</span></td></tr>';
+        $returnTr .= '<tr><td>SHOPEE</td><td><span class="badge bg-warning">' . $shopeeStock . '</span></td></tr>';
 
 
 
@@ -186,11 +187,11 @@ class StocksController extends Controller
         $lazadaID = $lazada["productid"];
         //check lazada token | qty
         $lazadaStock = 0;
-        $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+        $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $compPrefix);
         if (isset($jsonDecodeLazada)) {
             if (isset($jsonDecodeLazada["message"]) && strpos($jsonDecodeLazada["message"], "A facade root has not been set") !== false) {
-                $this->refreshLazadaToken();
-                $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+                $this->refreshLazadaToken($company);
+                $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $compPrefix);
             }
             $qty = $jsonDecodeLazada['data']['skus'];
             for ($x = 0; $x < count($qty); $x++) {
@@ -200,12 +201,9 @@ class StocksController extends Controller
                 }
             }
         }
-        $returnTr .= '<tr><td>LAZADA</td><td><span class="badge bg-info">'.$lazadaStock.'</span></td></tr>';
+        $returnTr .= '<tr><td>LAZADA</td><td><span class="badge bg-info">' . $lazadaStock . '</span></td></tr>';
 
         echo $returnTr;
-
-
-
     }
 
 
@@ -342,24 +340,24 @@ class StocksController extends Controller
         $pdo = $this->database->getPdo();
 
         $compPrefix = strtolower($company);
-        $compPrefix = substr($compPrefix, 0 , 3);
+        $compPrefix = substr($compPrefix, 0, 3);
 
 
-        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . ($compPrefix. "_settings"). "'";
+        $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . ($compPrefix . "_settings") . "'";
         $sql = $pdo->prepare($sql);
         $sql->execute();
         $values = $sql->fetch();
 
         $plantwhse = "";
 
-        $percentageShopee = 0; 
-        $percentageLazada = 0; 
+        $percentageShopee = 0;
+        $percentageLazada = 0;
 
-        if(isset($values)) {
-            $json = json_decode( $values["attributes"] ) ;
-            $plantwhse = $json->plantwhse ;
-            $percentageShopee = $json->shopee ;
-            $percentageLazada = $json->lazada ;
+        if (isset($values)) {
+            $json = json_decode($values["attributes"]);
+            $plantwhse = $json->plantwhse;
+            $percentageShopee = $json->shopee;
+            $percentageLazada = $json->lazada;
         }
         if (empty($plantwhse)) {
             echo json_encode(array("result" => "error", "message" => "Plant Warehouse is empty."));
@@ -371,8 +369,8 @@ class StocksController extends Controller
         }
 
         $sQty = 0.0;
-        if(!empty($plantwhse)) {
-             $sapQty = $this->getStocks($materialcode);
+        if (!empty($plantwhse)) {
+            $sapQty = $this->getStocks($materialcode);
             if (empty($sapQty)) {
                 echo json_encode(array("result" => "error", "message" => "No quantity found"));
                 exit();
@@ -383,25 +381,25 @@ class StocksController extends Controller
                 $arrayPlantWhse = explode("|", $plantwhse);
                 $arrData = explode("|", $arr);
                 $plant = $arrData[0];
-                    $plant = trim($plant);
+                $plant = trim($plant);
                 $whse = $arrData[1];
-                    $whse = trim($whse);
-                
+                $whse = trim($whse);
+
                 $attrPlant =  $arrayPlantWhse[0];
                 $attrWhse =  $arrayPlantWhse[1];
 
-                if($plant == $attrPlant && $whse == $attrWhse) {
-                     $qty = $arrData[2];
+                if ($plant == $attrPlant && $whse == $attrWhse) {
+                    $qty = $arrData[2];
                     $qty = trim($qty);
                     $sQty += (float) $qty;
                 }
             }
         }
 
-        if($percentageShopee < $percentageLazada) {
+        if ($percentageShopee < $percentageLazada) {
             $percentageShopee = $percentageLazada;
         }
-        
+
         $percentageShopee = $percentageShopee / 100;
         $shopeeQty = $sQty * $percentageShopee;
         $shopeeQty =  ceil($shopeeQty);
@@ -501,13 +499,13 @@ class StocksController extends Controller
 
         // check shopee token | qty
         $shopeeStock = 0;
-        $jsonQty = $this->getStocksFromShopee($shopeeID);
+        $jsonQty = $this->getStocksFromShopee($shopeeID, $company);
         $jsonDecodeShopee = json_decode($jsonQty, true);
         if (isset($jsonDecodeShopee["message"])) {
             if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
-                $this->refreshShopeeToken();
+                $this->refreshShopeeToken($company);
                 //set when expired
-                $jsonQty = $this->getStocksFromShopee($shopeeID);
+                $jsonQty = $this->getStocksFromShopee($shopeeID, $company);
                 $jsonDecodeShopee = json_decode($jsonQty, true);
             }
             $model = $jsonDecodeShopee["response"]["model"];
@@ -528,11 +526,11 @@ class StocksController extends Controller
 
         //check lazada token | qty
         $lazadaStock = 0;
-        $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+        $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $company);
         if (isset($jsonDecodeLazada)) {
             if (isset($jsonDecodeLazada["message"]) && strpos($jsonDecodeLazada["message"], "A facade root has not been set") !== false) {
                 $this->refreshLazadaToken();
-                $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode);
+                $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $company);
             }
             $qty = $jsonDecodeLazada['data']['skus'];
             for ($x = 0; $x < count($qty); $x++) {
@@ -551,8 +549,8 @@ class StocksController extends Controller
 
         $shopeeQty = 7; //ORIGINAL
         $lazadaQty = 3; //ORIGINAL
-        $this->syncShopeeStock($uuid["uuid"], $shopeeQty);
-        $this->syncLazadaStock($uuid["uuid"], $lazadaQty);
+        $this->syncShopeeStock($uuid["uuid"], $shopeeQty, $company);
+        $this->syncLazadaStock($uuid["uuid"], $lazadaQty, $company);
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -561,12 +559,12 @@ class StocksController extends Controller
         return true;
     }
 
-    public function syncLazadaStock(string $transactId, int $qty): bool
+    public function syncLazadaStock(string $transactId, int $qty, string $company): bool
     {
         $pdo = $this->database->getPdo();
         $response = "";
 
-        $lazadaVal = $this->selectValues('lazada'); // get shopee requirements
+
         $url = "https://api.lazada.com.ph/rest"; // ORIG
 
         $sql = "SELECT productid, materialcode FROM StockAlignSync WHERE transactno = ? AND accttype = ?";
@@ -575,7 +573,7 @@ class StocksController extends Controller
         $productID = $sql->fetch();
 
 
-
+        $lazadaVal = $this->selectValues('lazada', $company); // get lazada requirements
 
         $getLazadaRequirements = "SELECT skuid, sku FROM StockAlignSku WHERE productid = ? AND sku = ?";
         $getLazadaRequirements = $pdo->prepare($getLazadaRequirements);
@@ -654,12 +652,12 @@ class StocksController extends Controller
         return true;
     }
 
-    public function getLazadaItem($productID, $sku)
+    public function getLazadaItem($productID, $sku, $company)
     {
 
         $pdo = $this->database->getPdo();
 
-        $lazadaVal = $this->selectValues('lazada');
+        $lazadaVal = $this->selectValues('lazada', $company);
 
         $url = "https://api.lazada.com.ph/rest";
         $app_key = $lazadaVal['appkey'];
@@ -689,11 +687,11 @@ class StocksController extends Controller
         return $json;
     }
 
-    public function refreshLazadaToken()
+    public function refreshLazadaToken($company)
     {
 
         $pdo = $this->database->getPdo();
-        $lazadaVal = $this->selectValues('lazada');
+        $lazadaVal = $this->selectValues('lazada', $company);
 
         $url = "https://api.lazada.com.ph/rest";
         $appkey = $lazadaVal['appkey'];
@@ -713,12 +711,12 @@ class StocksController extends Controller
     }
 
 
-    public function syncShopeeStock(string $transactId, int $qty): bool
+    public function syncShopeeStock(string $transactId, int $qty, string $company): bool
     {
 
         $pdo = $this->database->getPdo();
 
-        $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
+        $shopeeVal = $this->selectValues('shopee', $company); // get shopee requirements
 
         $path = "/api/v2/product/update_stock";
         $partnerId = $shopeeVal['partnerID'];
@@ -799,13 +797,13 @@ class StocksController extends Controller
         return true;
     }
 
-    public function getStocksFromShopee($itemID)
+    public function getStocksFromShopee($itemID, $company)
     {
 
 
         $pdo = $this->database->getPdo();
 
-        $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
+        $shopeeVal = $this->selectValues('shopee', $company); // get shopee requirements
 
         $path = "/api/v2/product/get_model_list";
         $partnerId = $shopeeVal['partnerID'];
@@ -857,11 +855,11 @@ class StocksController extends Controller
         }
     }
 
-    public function refreshShopeeToken()
+    public function refreshShopeeToken($company)
     {
         $pdo = $this->database->getPdo();
 
-        $shopeeVal = $this->selectValues('shopee'); // get shopee requirements
+        $shopeeVal = $this->selectValues('shopee', $company); // get shopee requirements
 
         $path = "/api/v2/auth/access_token/get";
         $partnerId = $shopeeVal['partnerID'];
@@ -1129,12 +1127,14 @@ class StocksController extends Controller
         print_r("sfsf ");
     }
 
-    public function selectValues(String $settingsVal)
+    public function selectValues(String $settingsVal, $company)
     {
 
         $pdo = $this->database->getPdo();
 
-        $settingsVal = ($settingsVal == 'shopee' ? 'rob_shopee_value' : 'rob_lazada_value');
+        $company = substr($company, 0, 3);
+
+        $settingsVal = strtolower($company) . '_' . $settingsVal . '_value';
 
         $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . $settingsVal . "'";
 
