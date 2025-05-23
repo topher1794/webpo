@@ -7,6 +7,8 @@
 	<meta name="description" content="This is a login page template based on Bootstrap 5">
 	<title>Stock Alignment - Registration</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+	<link rel="stylesheet" href="Assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+
 	<script type="module" src="src/Views/Login/register.js"></script>
 </head>
 
@@ -110,6 +112,9 @@
 	<script src="Assets/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
 	<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- SweetAlert2 -->
+	<script src="Assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+	<script src="Assets/plugins/sweetalert2/sweetalert2.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="Assets/dist/js/adminlte.min.js"></script>
 </body>
