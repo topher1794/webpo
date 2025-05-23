@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace stockalignment\Model;
 
@@ -21,7 +21,7 @@ class UserModel
         return $stmt->fetch() !== false;
     }
 
-    
+
     public function usernameExists(string $username): bool
     {
 
@@ -30,9 +30,9 @@ class UserModel
         return $stmt->fetch() !== false;
     }
 
-    public function createUser(string $username, string $firstname, string $lastname, string $email, string $passwordHash): void
+    public function createUser(string $username, string $firstname, string $lastname, string $company, string $email, string $passwordHash): void
     {
-        $stmt = $this->pdo->prepare("INSERT INTO StockAlignUsers ( id, username, firstname, lastname, emailadd, bcrypt_pass) VALUES (UUID(), :username, :firstname,  :lastname,   :email, :password)");
-        $stmt->execute(['username' => $username, 'firstname' => $firstname, 'lastname' => $lastname, 'email' => $email, 'password' => $passwordHash]);
+        $stmt = $this->pdo->prepare("INSERT INTO StockAlignUsers ( id, username, firstname, lastname, company, emailadd, bcrypt_pass) VALUES (UUID(), :username, :firstname,  :lastname, :company, :email, :password)");
+        $stmt->execute(['username' => $username, 'firstname' => $firstname, 'lastname' => $lastname, 'company' => $company, 'email' => $email, 'password' => $passwordHash]);
     }
 }

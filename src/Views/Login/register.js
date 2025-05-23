@@ -12,6 +12,8 @@ $(document).on('submit', '#registerFrm', async (e) => {
         myObject[key] = value;
     }
 
+    console.log(myObject);
+
     fetchData('newRegistration', 'POST', myObject)
         .then(createdUser => {
             console.log(createdUser)

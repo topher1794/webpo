@@ -32,14 +32,15 @@ class RegistrationController extends Controller
         $username = $dataDecoded["username"] ?? "";
         $firstname = $dataDecoded["firstname"] ?? "";
         $lastname = $dataDecoded["lastname"] ?? "";
+        $company = $dataDecoded["company"] ?? "";
         $email = $dataDecoded["email"] ?? "";
         $password = $dataDecoded["password"] ?? "";
         $confirmpassword = $dataDecoded["confirm-password"] ?? "";
 
-        echo json_encode($this->register($username, $firstname, $lastname, $email, $password, $confirmpassword), JSON_PRETTY_PRINT);
+        echo json_encode($this->register($username, $firstname, $lastname, $company,  $email, $password, $confirmpassword), JSON_PRETTY_PRINT);
     }
 
-    public function register(string $username, string $firstname, string $lastname, string $email, string $password, string $newPassword): array
+    public function register(string $username, string $firstname, string $lastname, string $company, string $email, string $password, string $newPassword): array
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return ['status' => 400, 'message' => 'Invalid email format!'];
@@ -62,7 +63,7 @@ class RegistrationController extends Controller
         }
 
         $hash = password_hash($password, PASSWORD_BCRYPT);
-        $this->userModel->createUser($username, $firstname, $lastname, $email, $hash);
+        $this->userModel->createUser($username, $firstname, $lastname, $company, $email, $hash);
 
         return ['status' => 201, 'message' => 'User registered'];
     }

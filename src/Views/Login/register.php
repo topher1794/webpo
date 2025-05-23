@@ -52,6 +52,13 @@
 								</div>
 
 								<div class="mb-3">
+									<select class="form-control" name="company" id="company">
+										<option value="ROBERTS">ROBERTS</option>
+										<option value="URATEX">URATEX</option>
+									</select>
+								</div>
+
+								<div class="mb-3">
 									<!-- <label class="mb-2 text-muted" for="email">E-Mail Address</label> -->
 									<input id="email" type="email" class="form-control" name="email" value="" placeholder="Email" required>
 									<div class="invalid-feedback">

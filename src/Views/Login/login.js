@@ -49,6 +49,8 @@ export async function fetchData(endpoint, method, data = null) {
         body: data ? JSON.stringify(data) : null,
     };
 
+    console.log(options)
+
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
