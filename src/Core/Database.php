@@ -35,10 +35,13 @@ class Database
         $this->SAPIP = "10.0.220.168";
 
 
+
         $dbname = "";
         if (
-            strpos($_SERVER['HTTP_HOST'], "localhost") !== false || strpos($_SERVER['REQUEST_URI'], "localhost") !== false
-            || strpos(strtoupper($absolutePath), "QAS") !== FALSE
+            // strpos($_SERVER['HTTP_HOST'], "localhost") !== false || strpos($_SERVER['REQUEST_URI'], "localhost") !== false
+            strpos(strtoupper(SUFFIX_QAS), "QAS") !== FALSE
+            || 
+            strpos(strtoupper($absolutePath), "QAS") !== FALSE
         ) {
             $dbname = "_qas";
             $this->SAPPort = "8001";

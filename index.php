@@ -3,18 +3,28 @@
 use stockalignment\Router;
 
 require_once realpath("vendor/autoload.php");
-// $config = require_once 'src/Config.php';
-
 
 /**
  * DEFINING SET-UP HERE
  */
-// $uri = strtok($_SERVER['REQUEST_URI'], '?');
-// $host = $_SERVER['HTTP_HOST'];
-// $SUFFIX_QAS = "";
-// if (strpos($host, "_qas") !== FALSE || strpos($host, "localhost") !== FALSE) {
-//     $SUFFIX_QAS = "_qas";
-// }
+$host = $_SERVER['HTTP_HOST'];
+$SUFFIX_QAS = "";
+$BASE_URLQAS = "";
+if (strpos($host, "_qas") !== FALSE || strpos($host, "localhost") !== FALSE) {
+    $SUFFIX_QAS = "_qas";
+    $BASE_URLQAS = "_qas";
+    //FOR LOCALHOST AND DEVELOPING NOT USING QAS
+    if(strpos($host, "localhost") !== FALSE && !strpos($host, "_qas") !== FALSE) {
+        $BASE_URLQAS = "";
+    }
+}
+//$SUFFIX_QAS = "";  //# ENABLE THIS TO SKIP QAS SETUP
+//$BASE_URLQAS = ""; //# ENABLE THIS TO SKIP QAS SETUP
+define('BASE_URL', '/stockalignproj' . $BASE_URLQAS);
+define('SUFFIX_QAS', $SUFFIX_QAS);
+define('BASE_URLQAS', $BASE_URLQAS);
+
+
 
 error_reporting(0);
 ob_start();
