@@ -68,6 +68,54 @@ class StocksController extends Controller
         $this->render('Template/footer.php', $data);
     }
 
+    public function checkstock()
+    {
+        $data['logs'] = $_POST;
+        $data['controller'] = "stocks";
+        $data['action'] = "checkstock";
+
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Stock/stock.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
+
+    public function checkstockqty() {
+        $materialcode = $_POST["materialcode"] ??"";
+
+        if(empty($materialcode)) {
+            echo "<tr>Material Code is empty</tr><tr></tr>";
+            exit();
+        }
+        //sap qty
+
+
+        $pdo = $this->database->getPdo();
+
+
+        // $sql = "SELECT attributes FROM StockAlignSettings WHERE settingstype = '" . $settingsVal . "'";
+        // $sql = $pdo->prepare($sql);
+        // $sql->execute();
+        // $values = $sql->fetch();
+
+        $sapQty = $this->getStocks($materialcode);
+
+        $stockArr = explode("<br>", $sapQty);
+        print_r($stockArr);
+        $sQty = 0.0;
+        foreach ($stockArr as $arr) {
+            $arrData = explode("|", $arr);
+            $qty = $arrData[2];
+            $qty = trim($qty);
+            $sQty += (float) $qty;
+        }
+
+
+        echo $sQty;
+
+    }
+
+
 
     public function syncapi()
     {
@@ -193,7 +241,6 @@ class StocksController extends Controller
             exit();
         }
 
-        $stockQty = $this->getStocks($materialcode);
         $stockQty = $this->getStocks($materialcode);
 
         if (empty($stockQty)) {

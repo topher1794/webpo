@@ -82,6 +82,7 @@ class Router
                 "updatestockv1",
                 "apitokenv1",
                 "apirefreshtokenv1",
+                "checkstockqty", //should be comment
             );
             // print_r($uri);
             // exit();

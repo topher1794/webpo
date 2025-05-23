@@ -2,11 +2,11 @@
 
 use stockalignment\Router;
 
+
 require_once realpath("vendor/autoload.php");
 
 
 error_reporting(0);
-
 ob_start();
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -15,7 +15,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $router = new Router();
 
 /**
- * 
+ * Login
  */
 $router->get('/', stockalignment\Controller\AuthenticationController::class, 'index');
 $router->get('/login', stockalignment\Controller\AuthenticationController::class, 'index');
@@ -85,6 +85,11 @@ $router->post('/updatestockv1', stockalignment\Controller\StocksController::clas
 $router->post('/apitokenv1', stockalignment\Controller\AuthenticationController::class, 'generateToken');
 $router->post('/apirefreshtokenv1', stockalignment\Controller\AuthenticationController::class, 'refreshToken');
 
-
+/**
+ * Stock Checking
+*/
+$router->get('/checkstock', stockalignment\Controller\StocksController::class, 'checkstock');
+$router->post('/checkstockqty', stockalignment\Controller\StocksController::class, 'checkstockqty');
+ 
 
 $router->dispatch();

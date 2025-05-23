@@ -69,7 +69,16 @@
             <!-- <i class="fas fa-list nav-icon" aria-hidden="true"></i> -->
             <i class="fas fa-th-list nav-icon" aria-hidden="true"></i>
             <p>
-              Masterlist
+              Sku Masterlist
+            </p>
+          </a>
+        </li>
+
+         <li class="nav-item" id="li-dashboard">
+          <a href="checkstock" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+            <i class="fas fa-check nav-icon" aria-hidden="true"></i>
+            <p>
+              Stock Checking
             </p>
           </a>
         </li>
