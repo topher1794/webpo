@@ -9,7 +9,6 @@ use stockalignment\Controller\AuthenticationController;
 use Exception;
 use stockalignment\Model\UserModel;
 
-define('BASE_URL', '/stockalignproj');
 
 
 class Router
@@ -41,13 +40,25 @@ class Router
         $uri = strtok($_SERVER['REQUEST_URI'], '?');
         $method =  $_SERVER['REQUEST_METHOD'];
 
-        $host= $_SERVER['HTTP_HOST'];
-        $BASE_URL_QAS = "";
-        if (strpos($uri, "_qas") !== FALSE || strpos($uri, "localhost") !== FALSE) {
-            $BASE_URL_QAS = "_qas";
-        }
+        // $host= $_SERVER['HTTP_HOST'];
+        // $BASE_URL_QAS = "";
+        // if (strpos($uri, "_qas") !== FALSE || strpos($uri, "localhost") !== FALSE) {
+        //     $BASE_URL_QAS = "_qas";
+        // }
 
-        $uri = str_replace(BASE_URL . $BASE_URL_QAS, "", $uri);
+        // $uri = str_replace(BASE_URL . $BASE_URL_QAS, "", $uri);
+        // echo "uri:".$uri;
+
+        // print_r($_SERVER);
+
+        $uri = str_replace(BASE_URL . BASE_URLQAS, "", $uri);
+      
+
+        // echo "</br>".BASE_URL;
+        // echo "</br>".SUFFIX_QAS;
+
+        // echo $uri;
+
 
         // print_r($this->routes);
         // print_r( $method);
