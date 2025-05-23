@@ -2,19 +2,19 @@
 
 use stockalignment\Router;
 
-
 require_once realpath("vendor/autoload.php");
+// $config = require_once 'src/Config.php';
+
 
 /**
  * DEFINING SET-UP HERE
  */
-$uri = strtok($_SERVER['REQUEST_URI'], '?');
-$host = $_SERVER['HTTP_HOST'];
-$SUFFIX_QAS = "";
-if (strpos($host, "_qas") !== FALSE || strpos($host, "localhost") !== FALSE) {
-    $SUFFIX_QAS = "_qas";
-}
-
+// $uri = strtok($_SERVER['REQUEST_URI'], '?');
+// $host = $_SERVER['HTTP_HOST'];
+// $SUFFIX_QAS = "";
+// if (strpos($host, "_qas") !== FALSE || strpos($host, "localhost") !== FALSE) {
+//     $SUFFIX_QAS = "_qas";
+// }
 
 error_reporting(0);
 ob_start();
