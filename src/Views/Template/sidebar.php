@@ -74,7 +74,7 @@
           </a>
         </li>
 
-         <li class="nav-item" id="li-dashboard">
+        <li class="nav-item" id="li-dashboard">
           <a href="checkstock" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
             <i class="fas fa-check nav-icon" aria-hidden="true"></i>
             <p>
@@ -83,14 +83,17 @@
           </a>
         </li>
 
-        <li class="nav-item" id="li-dashboard">
-          <a href="users" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
-            <i class="fas fa-user nav-icon" aria-hidden="true"></i>
-            <p>
-              Users
-            </p>
-          </a>
-        </li>
+        <?php if ($_SESSION["role" == "ADMIN"]) { ?>
+          <li class="nav-item" id="li-dashboard">
+            <a href="users" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+              <i class="fas fa-user nav-icon" aria-hidden="true"></i>
+              <p>
+                Users
+              </p>
+            </a>
+          </li>
+        <?php } ?>
+
 
         <li class="nav-item" id="li-dashboard">
           <a target="_blank" href="swaggerapi" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
@@ -101,14 +104,17 @@
           </a>
         </li>
 
-         <li class="nav-item" id="li-dashboard">
-          <a target="_blank" href="settings" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
-            <i class="fa fa-cog nav-icon" aria-hidden="true"></i>
-            <p>
-              Settings
-            </p>
-          </a>
-        </li>
+        <?php if ($_SESSION["role" == "ADMIN"]) { ?>
+          <li class="nav-item" id="li-dashboard">
+            <a target="_blank" href="settings" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+              <i class="fa fa-cog nav-icon" aria-hidden="true"></i>
+              <p>
+                Settings
+              </p>
+            </a>
+          </li>
+        <?php } ?>
+
 
         <li class="nav-item" id="li-dashboard">
           <a href="Logout" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
