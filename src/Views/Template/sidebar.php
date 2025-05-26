@@ -83,7 +83,7 @@
           </a>
         </li>
 
-        <?php echo "...." . $_SESSION["role"] ; if ($_SESSION["role"] == "ADMIN") { ?>
+        <?php if ($_SESSION["role"] == "ADMIN") { ?>
           <li class="nav-item" id="li-dashboard">
             <a href="users" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
               <i class="fas fa-user nav-icon" aria-hidden="true"></i>
