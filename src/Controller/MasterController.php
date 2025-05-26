@@ -126,13 +126,18 @@ class MasterController extends Controller
         $company = $_POST['company'];
         $source = $_POST['source'];
 
+
+
         if (!empty($company) || !empty($source)) {
             $concat = "accttype = '" . $source . "' AND company = '" . $company . "'";
         } else {
             $concat = "accttype is not null";
         }
 
-
+        
+        if ($_SESSION["role" != "ADMIN"]) { 
+             $concat .= " AND company = '".$company."'";
+        }
 
         $sql = "SELECT accttype, parentsku, sku, productid, productname, skuid, shopsku, company 
                 FROM StockAlignSku 

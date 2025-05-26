@@ -63,7 +63,7 @@ class AuthenticationController extends Controller
         $pdo = $this->database->getPdo();
 
 
-        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, firstname, lastname, company FROM StockAlignUsers WHERE username = :username");
+        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, firstname, lastname, company, access_role FROM StockAlignUsers WHERE username = :username");
         $stmt->bindParam(':username', $email);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -77,6 +77,7 @@ class AuthenticationController extends Controller
                 $_SESSION["company"] = $user['company'];
                 $_SESSION["firstname"] = $user['firstname'];
                 $_SESSION["lastname"] = $user['lastname'];
+                $_SESSION["role"] = $user['access_role'];
                 $response = ['status' => 'success', 'message' => 'Login successful'];
                 header('Content-Type: application/json');
                 echo json_encode($response);
