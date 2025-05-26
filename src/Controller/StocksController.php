@@ -918,14 +918,11 @@ class StocksController extends Controller
 
     public function getStocks(string $materialcode)
     {
-
-        // echo "ddd" ;
-        // print_r($_GET);
-
         if (empty($materialcode)) {
             $materialcode = $_GET["materialcode"];
         }
 
+        $materialcode = trim($materialcode);
 
         $SAPPort =  $this->database->getSAPPort();
         $SAPIP =  $this->database->getSAPIP();

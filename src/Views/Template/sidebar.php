@@ -101,6 +101,15 @@
           </a>
         </li>
 
+         <li class="nav-item" id="li-dashboard">
+          <a target="_blank" href="settings" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
+            <i class="fa fa-cog nav-icon" aria-hidden="true"></i>
+            <p>
+              Settings
+            </p>
+          </a>
+        </li>
+
         <li class="nav-item" id="li-dashboard">
           <a href="Logout" class="nav-link" id="lia-report" onclick="menuclick(this.id)">
             <i class="fas fa-power-off"></i>
