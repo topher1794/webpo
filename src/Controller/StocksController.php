@@ -547,8 +547,8 @@ class StocksController extends Controller
 
 
 
-        $shopeeQty = 7; //ORIGINAL
-        $lazadaQty = 3; //ORIGINAL
+        // $shopeeQty = 7; //ORIGINAL
+        // $lazadaQty = 3; //ORIGINAL
         $this->syncShopeeStock($uuid["uuid"], $shopeeQty, $company);
         $this->syncLazadaStock($uuid["uuid"], $lazadaQty, $company);
     }
