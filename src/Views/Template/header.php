@@ -1,6 +1,12 @@
 <!doctype html>
 <html>
 
+<?php
+
+$uri = explode('/', $_SERVER['REQUEST_URI']);
+
+?>
+
 <head>
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta charset="utf-8">
@@ -42,6 +48,13 @@
 	<!-- Theme style -->
 	<link rel="stylesheet" href="Assets/dist/css/adminlte.min.css">
 
+	<?php if ($uri[2] == 'home') { ?>
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Concert+One&family=Poetsen+One&display=swap" rel="stylesheet">
+	<?php } ?>
+
 	<!-- Google signin -->
 	<meta name="google-signin-scope" content="profile email">
 	<meta name="google-signin-client_id" content="975215138073-q01j0lkacgag3t9sfmb91qltkjk6efne.apps.googleusercontent.com">
@@ -50,6 +63,26 @@
 
 
 </head>
+
+<style>
+	.bebas-neue-regular {
+		font-family: "Bebas Neue", sans-serif;
+		font-weight: 400;
+		font-style: normal;
+	}
+
+	.poetsen-one-regular {
+		font-family: "Poetsen One", sans-serif;
+		font-weight: 400;
+		font-style: normal;
+	}
+
+	.concert-one-regular {
+		font-family: "Concert One", sans-serif;
+		font-weight: 400;
+		font-style: normal;
+	}
+</style>
 
 <body id="mybody" class="hold-transition sidebar-mini layout-fixed layout-footer-fixed">
 	<!-- Site wrapper -->

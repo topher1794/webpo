@@ -14,7 +14,7 @@ if (strpos($host, "_qas") !== FALSE || strpos($host, "localhost") !== FALSE) {
     $SUFFIX_QAS = "_qas";
     $BASE_URLQAS = "_qas";
     //FOR LOCALHOST AND DEVELOPING NOT USING QAS
-    if(strpos($host, "localhost") !== FALSE && !strpos($host, "_qas") !== FALSE) {
+    if (strpos($host, "localhost") !== FALSE && !strpos($host, "_qas") !== FALSE) {
         $BASE_URLQAS = "";
     }
 }
@@ -37,26 +37,29 @@ $router = new Router();
 /**
  * Login
  */
+// Authentication Controllers
 $router->get('/', stockalignment\Controller\AuthenticationController::class, 'index');
 $router->get('/login', stockalignment\Controller\AuthenticationController::class, 'index');
 $router->get('/Logout', stockalignment\Controller\AuthenticationController::class, 'logOut');
-
-
-$router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
 $router->post('/userAuthen', stockalignment\Controller\AuthenticationController::class, 'userAuthenticate');
+
+// Stock Controllers
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
+$router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
+$router->get('/dashboard', stockalignment\Controller\StocksController::class, 'dashboard');
 $router->get('/getItemFromShopee', stockalignment\Controller\StocksController::class, 'getItemFromShopee');
 $router->get('/getAccessToken', stockalignment\Controller\StocksController::class, 'getAccessToken');
 $router->get('/getAccessTokenLazada', stockalignment\Controller\StocksController::class, 'getAccessTokenLazada');
 $router->get('/refreshLazadaToken', stockalignment\Controller\StocksController::class, 'refreshLazadaToken');
 $router->get('/getLazadaItem', stockalignment\Controller\StocksController::class, 'getLazadaItem');
 $router->post('/getDetails', stockalignment\Controller\StocksController::class, 'getDetails');
+$router->get('/home', stockalignment\Controller\StocksController::class, 'home');
 
+// Registration Controllers
 $router->get('/registration', stockalignment\Controller\RegistrationController::class, 'registration');
 $router->post('/newRegistration', stockalignment\Controller\RegistrationController::class, 'newRegistration');
 
 
-$router->get('/dashboard', stockalignment\Controller\StocksController::class, 'dashboard');
 
 
 /**

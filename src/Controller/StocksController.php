@@ -1235,4 +1235,14 @@ class StocksController extends Controller
     //     return $ret;
     // }
 
+
+    public function home()
+    {
+
+        $data['logs'] = $_POST;
+        $this->render('Template/header.php', $data);
+        $this->render('Template/sidebar.php', $data);
+        $this->render('Home/home.php', $data);
+        $this->render('Template/footer.php', $data);
+    }
 }
