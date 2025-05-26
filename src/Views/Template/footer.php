@@ -81,6 +81,8 @@
 
 
 <?php if (in_array($controller, array("master"))) { ?>
+
+
   <?php if (in_array($action, array("sku"))) { ?>
     <script type="module"  src="Assets/js/Sku.js"></script>
   <?php } ?>
@@ -89,10 +91,18 @@
     <script type="module"  src="Assets/js/Users.js"></script>
   <?php } ?>
 
-
   
 <?php } ?>
 
+
+
+<?php if (in_array($controller, array("settings"))) { ?>
+
+  <?php if (in_array($action, array("settings"))) { ?>
+    <script type="module"  src="Assets/js/Settings.js"></script>
+  <?php } ?>
+  
+<?php } ?>
 
 
 

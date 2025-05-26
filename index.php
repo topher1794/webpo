@@ -44,7 +44,6 @@ $router->get('/Logout', stockalignment\Controller\AuthenticationController::clas
 
 $router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
 $router->post('/userAuthen', stockalignment\Controller\AuthenticationController::class, 'userAuthenticate');
-$router->get('/getStocks', stockalignment\Controller\StocksController::class, 'getStocks');
 $router->get('/getItemFromShopee', stockalignment\Controller\StocksController::class, 'getItemFromShopee');
 $router->get('/getAccessToken', stockalignment\Controller\StocksController::class, 'getAccessToken');
 $router->get('/getAccessTokenLazada', stockalignment\Controller\StocksController::class, 'getAccessTokenLazada');
@@ -110,6 +109,16 @@ $router->post('/apirefreshtokenv1', stockalignment\Controller\AuthenticationCont
  */
 $router->get('/checkstock', stockalignment\Controller\StocksController::class, 'checkstock');
 $router->post('/checkstockqty', stockalignment\Controller\StocksController::class, 'checkstockqty');
+
+/**
+ * Settings
+ */
+
+$router->get('/settings' ,  stockalignment\Controller\SettingsController::class, 'settings');
+$router->post('/getSettings', stockalignment\Controller\SettingsController::class, 'getSettings');
+$router->post('/updateSettings', stockalignment\Controller\SettingsController::class, 'updateSettings');
+
+
 
 
 $router->dispatch();
