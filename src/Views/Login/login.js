@@ -25,7 +25,7 @@ $(document).on('submit', '#loginFrm', async function (e) {
 
                 }, 3000);
             } else {
-                window.location.href = 'dashboard';
+                window.location.href = 'home';
             }
 
         })
