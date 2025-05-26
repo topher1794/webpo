@@ -24,13 +24,8 @@ $(document).on('submit', '#registerFrm', async (e) => {
                     alert(createdUser.message, 'danger');
                     break;
                 case 201:
-                    alert(createdUser.message, 'success');
-                    $('#username').val('');
-                    $('#firstname').val('');
-                    $('#lastname').val('');
-                    $('#email').val('');
-                    $('#password').val('');
-                    $('#confirm-password').val('');
+                    // alert(createdUser.message, 'success');
+                    sweetAlert(createdUser.message, 'login');
                 default:
                     createdUser.status
             }
@@ -70,6 +65,18 @@ function alert(message, alertType) {
     console.log(alertType)
     $('#alert').removeAttr('class');
     $('#alert').prop('class', 'alert alert-' + alertType).text(message).fadeIn();
+}
+
+
+function sweetAlert(message, url) {
+    Swal.fire({
+        title: message,
+        allowOutsideClick: false,
+        icon: "success",
+        draggable: true
+    }).then((result) => {
+        window.location.href = url
+    });
 }
 
 
