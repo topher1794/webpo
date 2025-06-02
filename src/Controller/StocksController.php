@@ -85,6 +85,7 @@ class StocksController extends Controller
         $materialcode = $_POST["materialcode"] ?? "";
         $company = $_POST["company"] ?? "";
 
+        $company = "ROBERTS";
         if (empty($materialcode)) {
             echo "<tr>Material Code is empty</tr><tr></tr>";
             exit();
@@ -119,6 +120,9 @@ class StocksController extends Controller
         $sQty = 0.0;
         if (!empty($plantwhse)) {
             $sapQty = $this->getStocks($materialcode);
+
+        
+
             $stockArr = explode("<br>", $sapQty);
             foreach ($stockArr as $arr) {
                 $arrayPlantWhse = explode("|", $plantwhse);
@@ -142,6 +146,7 @@ class StocksController extends Controller
 
         $returnTr .= '<tr><td>SAP</td><td><span class="badge bg-primary">' . $sQty . '</span></td></tr>';
 
+        
 
         try {
             $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
@@ -844,6 +849,7 @@ class StocksController extends Controller
             $error = curl_error($ch);
             curl_close($ch);
 
+            print_r($response);
             if ($error) {
                 echo "cURL Error: $error";
                 return $error;
