@@ -121,7 +121,7 @@ class StocksController extends Controller
         if (!empty($plantwhse)) {
             $sapQty = $this->getStocks($materialcode);
 
-        
+
 
             $stockArr = explode("<br>", $sapQty);
             foreach ($stockArr as $arr) {
@@ -146,7 +146,7 @@ class StocksController extends Controller
 
         $returnTr .= '<tr><td>SAP</td><td><span class="badge bg-primary">' . $sQty . '</span></td></tr>';
 
-        
+
 
         try {
             $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
@@ -401,6 +401,8 @@ class StocksController extends Controller
             }
         }
 
+        // $sQty = 5;
+
         if ($percentageShopee < $percentageLazada) {
             $percentageShopee = $percentageLazada;
         }
@@ -408,6 +410,9 @@ class StocksController extends Controller
         $percentageShopee = $percentageShopee / 100;
         $shopeeQty = $sQty * $percentageShopee;
         $shopeeQty =  ceil($shopeeQty);
+
+        // echo $percentageShopee;
+        // exit();
 
         //Lazada
         $lazadaQty =  $sQty - $shopeeQty;
@@ -534,7 +539,7 @@ class StocksController extends Controller
         $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $company);
         if (isset($jsonDecodeLazada)) {
             if (isset($jsonDecodeLazada["message"]) && strpos($jsonDecodeLazada["message"], "A facade root has not been set") !== false) {
-                $this->refreshLazadaToken();
+                $this->refreshLazadaToken($company);
                 $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $company);
             }
             $qty = $jsonDecodeLazada['data']['skus'];
@@ -549,11 +554,8 @@ class StocksController extends Controller
             $sql->execute([$lazadaStock,  $uuid["uuid"], 'LAZADA']);
         }
 
-
-
-
-        // $shopeeQty = 7; //ORIGINAL
-        // $lazadaQty = 3; //ORIGINAL
+        // $shopeeQty = 2; //ORIGINAL
+        // $lazadaQty = 2; //ORIGINAL
         $this->syncShopeeStock($uuid["uuid"], $shopeeQty, $company);
         $this->syncLazadaStock($uuid["uuid"], $lazadaQty, $company);
     }
@@ -739,21 +741,23 @@ class StocksController extends Controller
         $getProductId->execute([$transactId]);
         $productId = $getProductId->fetch();
 
-        $payload = '
-        {
-            "item_id": ' . $productId['productid'] . ',
-            "stock_list": [
-                {
-                    "model_id": ' . $productId['modelid'] . ',
-            
-                    "seller_stock": [
-                        {
-                            "stock": ' . $qty . '
-                        }
+        $data = [
+            "item_id" => (int) $productId['productid'],  // must be int
+            "stock_list" => [
+                [
+                    "model_id" => (int) $productId['modelid'],  // must be int
+                    "seller_stock" => [
+                        [
+                            "stock" => (int) $qty  // must be int
+                        ]
                     ]
-                }
+                ]
             ]
-        }';
+        ];
+
+        $payload = json_encode($data);
+
+
 
 
 
@@ -761,8 +765,12 @@ class StocksController extends Controller
         try {
             // payload
             $curl = curl_init();
-            $url = 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . $shopeeVal['partnerID'] . '&shop_id=' . (int)$shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '';
-            echo $url;
+            $url = 'https://partner.shopeemobile.com/' . $path . '?access_token=' . $shopeeVal['access_token'] . '&partner_id=' . (int)$shopeeVal['partnerID'] . '&shop_id=' . (int)$shopeeVal['shopID'] . '&sign=' . $sign . '&timestamp=' . $timest . '';
+            // echo $url;
+
+
+            $curl = curl_init();
+
             curl_setopt_array($curl, array(
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
@@ -771,6 +779,7 @@ class StocksController extends Controller
                 CURLOPT_TIMEOUT => 0,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSL_VERIFYPEER => FALSE,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => $payload,
                 CURLOPT_HTTPHEADER => array(
@@ -786,6 +795,9 @@ class StocksController extends Controller
 
             // $response = curl_exec($curl);
             $response = curl_exec($curl);
+            $err = curl_error($curl);
+
+
 
             curl_close($curl);
 
