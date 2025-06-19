@@ -1,4 +1,7 @@
 import ClsAsync from './ClsAsync.js';
+
+var clsSync = new ClsAsync('test');
+
 var myTable = "";
 $(function () {
     loadList();
@@ -134,9 +137,29 @@ $(document).on('click', '#btnSubmit', async function () {
     // frmData.push(
     //     { name: 'salesorg', value: company }
     // );
+
     let url = "syncviaform";
     let result = await clsSync.getAjaxAsync(url, 'POST', frmData);
-    console.log(result);
+
+    let myResult = JSON.parse(result);
+
+    if (myResult.result == 'error') {
+        $("#newSyncModal").modal('hide');
+    }
+
+    Swal.fire({
+        title: myResult.message,
+        icon: myResult.result,
+        draggable: true
+    }).then((res) => {
+
+        if (res.isConfirmed) {
+            if (myResult.result == 'error') {
+                $("#newSyncModal").modal('show');
+            }
+        }
+
+    });
 
 
 });

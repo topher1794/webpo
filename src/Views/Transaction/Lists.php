@@ -142,7 +142,7 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputEmail1">Material Code</label>
-                            <input name="materialcode" id="materialcode" type="text" class="form-control form-control-border border-width-2" required />
+                            <input name="materialcode" id="materialcode" type="text" class="form-control form-control-border border-width-2" placeholder="MattCode here..." required />
                         </div>
                     </div>
                     <!-- <div class="card-footer">

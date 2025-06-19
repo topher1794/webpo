@@ -29,14 +29,14 @@
           </a>
         </li>
 
-        <li class="nav-item" id="li-new">
+        <!-- <li class="nav-item" id="li-new">
           <a href="newsync" class="nav-link" id="lia-new" onclick="menuclick(this.id)">
             <i class="fas fa-upload nav-icon" aria-hidden="true"></i>
             <p>
               New Sync
             </p>
           </a>
-        </li>
+        </li> -->
 
         <li class="nav-item" id="li-request">
           <a href="#" class="nav-link" id="lia-request" onclick="menuclick(this.id)">
