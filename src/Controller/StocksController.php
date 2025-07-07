@@ -116,7 +116,7 @@ class StocksController extends Controller
             $json = json_decode($values["attributes"]);
             $plantwhse = $json->plantwhse;
         }
-
+        // echo $plantwhse;
         $sQty = 0.0;
         if (!empty($plantwhse)) {
             $sapQty = $this->getStocks($materialcode);
@@ -124,22 +124,29 @@ class StocksController extends Controller
 
 
             $stockArr = explode("<br>", $sapQty);
+            print_r($stockArr);
             foreach ($stockArr as $arr) {
-                $arrayPlantWhse = explode("|", $plantwhse);
+                $arrayPlantWhse = explode(",", $plantwhse);
                 $arrData = explode("|", $arr);
                 $plant = $arrData[0];
                 $plant = trim($plant);
                 $whse = $arrData[1];
                 $whse = trim($whse);
 
-                $attrPlant =  $arrayPlantWhse[0];
-                $attrWhse =  $arrayPlantWhse[1];
 
-                if ($plant == $attrPlant && $whse == $attrWhse) {
-                    $qty = $arrData[2];
-                    $qty = trim($qty);
-                    $sQty += (float) $qty;
+                foreach($arrayPlantWhse as $arrPlant) {
+                       $arrPlantExplode = explode("|", $arrPlant);
+                       $attrPlant =  $arrPlantExplode[0];
+                        $attrWhse =  $arrPlantExplode[1];
+
+                        if ($plant == $attrPlant && $whse == $attrWhse) {
+                            $qty = $arrData[2];
+                            $qty = trim($qty);
+                            $sQty += (float) $qty;
+                        }
                 }
+
+              
             }
         }
 
@@ -149,7 +156,7 @@ class StocksController extends Controller
 
 
         try {
-            $stmtShopee = $pdo->prepare("SELECT productid, skuid FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
+            $stmtShopee = $pdo->prepare("SELECT productid, skuid, sku FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
             $stmtShopee->execute([$company, $materialcode]);
             $stmtShopee->execute();
             $shopee = $stmtShopee->fetch(PDO::FETCH_ASSOC);
@@ -159,27 +166,56 @@ class StocksController extends Controller
 
 
         $shopeeID = $shopee["productid"];
+        $shopeeSku = $shopee["sku"];
 
         // check shopee token | qty
         $shopeeStock = 0;
-        $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix);
-        $jsonDecodeShopee = json_decode($jsonQty, true);
-        if (isset($jsonDecodeShopee["message"])) {
-            if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
-                $this->refreshShopeeToken($compPrefix);
-                //set when expired
-                $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix);
-                $jsonDecodeShopee = json_decode($jsonQty, true);
-            }
-            $model = $jsonDecodeShopee["response"]["model"];
-            foreach ($model as $i => $val) {
-                $valModelId = $val["model_id"];
-                if ($valModelId == $shopee["skuid"]) {
-                    $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
-                    break;
+
+
+        $base_info = "base_info";
+        if(!empty($shopeeSku)) { //use itemlist
+             $base_info = "";
+        }
+
+        $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix, $base_info);
+            $jsonDecodeShopee = json_decode($jsonQty, true);
+
+              if (isset($jsonDecodeShopee["message"])) {
+                if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
+                    $this->refreshShopeeToken($compPrefix);
+                    //set when expired
+                    $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix, "");
+                    $jsonDecodeShopee = json_decode($jsonQty, true);
+
+                }
+                $model = $jsonDecodeShopee["response"]["model"];
+                $model_id = "model_id";
+                if($base_info == "base_info"){
+                    $model = $jsonDecodeShopee["response"]["item_list"];
+                    $model_id = "item_id";
+                }
+
+                foreach ($model as $i => $val) {
+                    $valModelId = $val["".$model_id.""];
+                    if($base_info == "base_info"){
+                         if ($valModelId == $shopeeID) {
+                            $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                            break;
+                        }
+                    }else{
+                        if ($valModelId == $shopee["skuid"]) {
+                            $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                            break;
+                        }
+
+                    }
+                    
                 }
             }
-        }
+
+       
+
+
 
         $returnTr .= '<tr><td>SHOPEE</td><td><span class="badge bg-warning">' . $shopeeStock . '</span></td></tr>';
 
@@ -509,13 +545,15 @@ class StocksController extends Controller
 
         // check shopee token | qty
         $shopeeStock = 0;
-        $jsonQty = $this->getStocksFromShopee($shopeeID, $company);
+
+        /*
+        $jsonQty = $this->getStocksFromShopee($shopeeID, $company, "");
         $jsonDecodeShopee = json_decode($jsonQty, true);
         if (isset($jsonDecodeShopee["message"])) {
             if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
                 $this->refreshShopeeToken($company);
                 //set when expired
-                $jsonQty = $this->getStocksFromShopee($shopeeID, $company);
+                $jsonQty = $this->getStocksFromShopee($shopeeID, $company, "");
                 $jsonDecodeShopee = json_decode($jsonQty, true);
             }
             $model = $jsonDecodeShopee["response"]["model"];
@@ -533,6 +571,60 @@ class StocksController extends Controller
                 }
             }
         }
+        */
+
+        $base_info = "base_info";
+        if(!empty($shopeeSku)) { //use itemlist
+             $base_info = "";
+        }
+
+        $jsonQty = $this->getStocksFromShopee($shopeeID, $company, $base_info);
+            $jsonDecodeShopee = json_decode($jsonQty, true);
+
+              if (isset($jsonDecodeShopee["message"])) {
+                if (strpos($jsonDecodeShopee["message"], "Invalid access_token") !== false) {
+                    $this->refreshShopeeToken($company);
+                    //set when expired
+                    $jsonQty = $this->getStocksFromShopee($shopeeID, $company, "");
+                    $jsonDecodeShopee = json_decode($jsonQty, true);
+
+                }
+                $model = $jsonDecodeShopee["response"]["model"];
+                $model_id = "model_id";
+                if($base_info == "base_info"){
+                    $model = $jsonDecodeShopee["response"]["item_list"];
+                    $model_id = "item_id";
+                }
+
+                foreach ($model as $i => $val) {
+                    $valModelId = $val["".$model_id.""];
+                    if($base_info == "base_info"){
+                         if ($valModelId == $shopeeID) {
+                            $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                            $sql = "UPDATE StockAlignSync SET orig_qty = ? WHERE transactno= ? and accttype = 'SHOPEE'";
+                            $statement = $pdo->prepare($sql);
+                            $statement->execute([
+                                $shopeeStock,
+                                $uuid["uuid"]
+                            ]);
+                            break;
+                        }
+                    }else{
+                        if ($valModelId == $shopee["skuid"]) {
+                            $shopeeStock = $val["stock_info_v2"]["summary_info"]["total_available_stock"];
+                            $sql = "UPDATE StockAlignSync SET orig_qty = ? WHERE transactno= ? and accttype = 'SHOPEE'";
+                            $statement = $pdo->prepare($sql);
+                            $statement->execute([
+                                $shopeeStock,
+                                $uuid["uuid"]
+                            ]);
+                            break;
+                        }
+
+                    }
+                    
+                }
+            }
 
         //check lazada token | qty
         $lazadaStock = 0;
@@ -814,7 +906,7 @@ class StocksController extends Controller
         return true;
     }
 
-    public function getStocksFromShopee($itemID, $company)
+    public function getStocksFromShopee(string $itemID,string  $company, string $type)
     {
 
 
@@ -823,6 +915,11 @@ class StocksController extends Controller
         $shopeeVal = $this->selectValues('shopee', $company); // get shopee requirements
 
         $path = "/api/v2/product/get_model_list";
+
+        if($type == "base_info") {
+             $path = "/api/v2/product/get_item_base_info";
+        }
+
         $partnerId = $shopeeVal['partnerID'];
         $partnerKey = $shopeeVal['partnerKey'];
         $access_token = $shopeeVal['access_token'];
@@ -835,20 +932,37 @@ class StocksController extends Controller
 
 
         $url = "https://partner.shopeemobile.com$path";
-        $query = http_build_query([
+
+        
+        $query = [
             'partner_id'   => $partnerId,
             'timestamp'    => $timest,
             'access_token' => urlencode($access_token),
             'shop_id'      => $shopid,
             'sign'         => $sign,
             'item_id' => $itemID
-        ]);
+        ];
+        // print_r($query);
+        if($type == "base_info") {
+            $query = [
+                'partner_id'   => $partnerId,
+                'timestamp'    => $timest,
+                'access_token' => urlencode($access_token),
+                'shop_id'      => $shopid,
+                'sign'         => $sign,
+                'need_tax_info' => true,
+                'need_complaint_policy' => true,
+                'item_id_list' => $itemID
+            ];
+        }
+        $query = http_build_query($query);
 
 
         try {
 
             $ch = curl_init();
 
+            echo $url . '?' . $query;
             // Setup cURL options for GET
             curl_setopt($ch, CURLOPT_URL, $url . '?' . $query);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -861,7 +975,6 @@ class StocksController extends Controller
             $error = curl_error($ch);
             curl_close($ch);
 
-            print_r($response);
             if ($error) {
                 echo "cURL Error: $error";
                 return $error;
