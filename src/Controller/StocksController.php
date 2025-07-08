@@ -124,7 +124,7 @@ class StocksController extends Controller
 
 
             $stockArr = explode("<br>", $sapQty);
-            print_r($stockArr);
+            // print_r($stockArr);
             foreach ($stockArr as $arr) {
                 $arrayPlantWhse = explode(",", $plantwhse);
                 $arrData = explode("|", $arr);
@@ -419,6 +419,8 @@ class StocksController extends Controller
 
             $stockArr = explode("<br>", $sapQty);
             foreach ($stockArr as $arr) {
+                
+                /*
                 $arrayPlantWhse = explode("|", $plantwhse);
                 $arrData = explode("|", $arr);
                 $plant = $arrData[0];
@@ -434,6 +436,30 @@ class StocksController extends Controller
                     $qty = trim($qty);
                     $sQty += (float) $qty;
                 }
+
+                */
+
+                $arrayPlantWhse = explode(",", $plantwhse);
+                $arrData = explode("|", $arr);
+                $plant = $arrData[0];
+                $plant = trim($plant);
+                $whse = $arrData[1];
+                $whse = trim($whse);
+
+
+                foreach($arrayPlantWhse as $arrPlant) {
+                       $arrPlantExplode = explode("|", $arrPlant);
+                       $attrPlant =  $arrPlantExplode[0];
+                        $attrWhse =  $arrPlantExplode[1];
+
+                        if ($plant == $attrPlant && $whse == $attrWhse) {
+                            $qty = $arrData[2];
+                            $qty = trim($qty);
+                            $sQty += (float) $qty;
+                        }
+                }
+
+
             }
         }
 
@@ -445,7 +471,7 @@ class StocksController extends Controller
 
         $percentageShopee = $percentageShopee / 100;
         $shopeeQty = $sQty * $percentageShopee;
-        $shopeeQty =  ceil($shopeeQty);
+        $shopeeQty =  round($shopeeQty); // switch to round instead of ceil
 
         // echo $percentageShopee;
         // exit();
@@ -470,6 +496,8 @@ class StocksController extends Controller
          * get user id who requested the sync and empname
          * 
          */
+
+        //  print_r($data) ;
 
         $userid = $data["userid"];
         $empname = $data["empname"];
