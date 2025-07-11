@@ -156,7 +156,12 @@ $(document).on('click', '#btnSubmit', async function () {
         if (res.isConfirmed) {
             if (myResult.result == 'error') {
                 $("#newSyncModal").modal('show');
+                return;
             }
+             $("#newSyncModal").modal('hide');
+             myTable.destroy();
+            loadList();
+
         }
 
     });

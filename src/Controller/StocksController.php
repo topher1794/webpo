@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Exception;
 use PhpParser\Node\Stmt\Echo_;
 use stockalignment\Controller\AuthenticationController;
+use stockalignment\Classes\Jwt;
 
 use stockalignment\Classes\SAP;
 
@@ -280,11 +281,25 @@ class StocksController extends Controller
         $param1 = $explode2[0];
         $password = $explode2[1];
 
-        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, empname FROM StockAlignUsers WHERE username = :username");
-        $stmt->bindParam(':username', $param1);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stored_hash = $user['password'];
+
+         $stored_hash = "";
+         $user = [];
+
+        try{
+            $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, concat(firstname, ' ', lastname) as empname  FROM StockAlignUsers WHERE username = :username");
+            $stmt->bindParam(':username', $param1);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stored_hash = $user['password'];
+        }catch(\PDOException $e){
+            http_response_code(400);
+            echo json_encode(["message" => $e->getMessage()], JSON_PRETTY_PRINT);
+            exit();
+        }   
+        
+
+
+
 
 
         if (!password_verify($password, $stored_hash)) {
@@ -300,6 +315,7 @@ class StocksController extends Controller
             echo json_encode(["message" => "User not found."], JSON_PRETTY_PRINT);
             exit();
         }
+
         $access_token = $_POST["access_token"];
         if (empty($access_token)) {
             http_response_code(400);
@@ -307,12 +323,33 @@ class StocksController extends Controller
             exit();
         }
 
+        // print_r($user);
+        // print_r($userid);
+        // print_r($access_token);
 
-        $stmt = $pdo->prepare("SELECT date(expireddate) as expireddate , access_token FROM StockAlignTokens WHERE userid = :userid AND access_token = :access_token AND status ");
-        $stmt->bindParam(':userid', $userid);
-        $stmt->bindParam(':access_token', $access_token);
-        $stmt->execute();
-        $arrayToken = $stmt->fetch(PDO::FETCH_ASSOC);
+         $arrayToken  = [];
+         try{
+
+             $SECRET_KEY = "STOCKSAPI_UX1968";
+            $JwtController = new Jwt($SECRET_KEY);
+
+            $access_token = $JwtController->decode($access_token);
+            $sha1token =  $access_token["sha1Token"];
+            // print_r($access_token);
+            // echo $sha1token;
+            // exit();
+            
+            $stmt = $pdo->prepare("SELECT date(expireddate) as expireddate , access_token FROM StockAlignTokens WHERE userid = :userid AND access_token = :access_token AND status ");
+            $stmt->bindParam(':userid', $userid);
+            $stmt->bindParam(':access_token', $sha1token);
+            $stmt->execute();
+            $arrayToken = $stmt->fetch(PDO::FETCH_ASSOC);
+        }catch(\PDOException $e){
+            http_response_code(400);
+            echo json_encode(["message" => $e->getMessage()], JSON_PRETTY_PRINT);
+            exit();
+        }   
+        
         if (empty($arrayToken)) {
             http_response_code(400);
             echo json_encode(["message" => "Access token not found."], JSON_PRETTY_PRINT);
@@ -676,8 +713,16 @@ class StocksController extends Controller
 
         // $shopeeQty = 2; //ORIGINAL
         // $lazadaQty = 2; //ORIGINAL
-        $this->syncShopeeStock($uuid["uuid"], $shopeeQty, $company);
-        $this->syncLazadaStock($uuid["uuid"], $lazadaQty, $company);
+        $syncShopee = $this->syncShopeeStock($uuid["uuid"], $shopeeQty, $company);
+        $syncLazada = $this->syncLazadaStock($uuid["uuid"], $lazadaQty, $company);
+
+        if($syncLazada &&   $syncLazada) {
+            echo json_encode(array("result" => "success", "message" => "Successfully synced."));
+            exit();
+        }
+        echo json_encode(array("result" => "error", "message" => "Not synced."));
+        exit();
+
     }
 
     public function syncEcomStock(string $user, int $shopeeQty, int $lazadaQty): bool
@@ -925,7 +970,7 @@ class StocksController extends Controller
             $sql = $pdo->prepare($sql);
             $sql->execute([$response, $transactId, 'SHOPEE']);
         } catch (\Exception $e) {
-            print_r($e);
+            // print_r($e);
         }
 
 
@@ -990,7 +1035,7 @@ class StocksController extends Controller
 
             $ch = curl_init();
 
-            echo $url . '?' . $query;
+            // echo $url . '?' . $query;
             // Setup cURL options for GET
             curl_setopt($ch, CURLOPT_URL, $url . '?' . $query);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

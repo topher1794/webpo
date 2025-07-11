@@ -3,6 +3,8 @@ namespace stockalignment\Classes;
 
 use InvalidArgumentException;
 use InvalidSignatureException;
+use Firebase\JWT\SignatureInvalidException;
+
 
 class Jwt
 {
@@ -50,7 +52,7 @@ class Jwt
         
         if ( ! hash_equals($signature, $signature_from_token)) {
             
-            throw new InvalidSignatureException;
+            throw new SignatureInvalidException;
         }
         
         $payload = json_decode($this->base64urlDecode($matches["payload"]), true);
