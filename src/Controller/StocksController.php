@@ -1164,16 +1164,23 @@ class StocksController extends Controller
 
         $page = $_POST['page'] ?? "";
 
+        $userid = $_SESSION["userno"];
+
         if (!empty($from) && !empty($to)) {
-            $concat = "AND (DATE(inputdate) BETWEEN '" . $from . "' AND '" . $to . "')";
+            $concat = "AND (DATE(a.inputdate) BETWEEN '" . $from . "' AND '" . $to . "')";
+        }
+        if(  $_SESSION["role"] == "ADMIN") {
+            $concat .= " and a.userid= '".$userid."'";
         }
 
+
         $sql = "SELECT 
-                    inputdate
-                    ,transactno
-                    ,materialcode
-                    ,company
-                    ,source
+                   a.inputdate
+                    ,a.transactno
+                    ,a.materialcode
+                    ,a.company
+                    ,a.source
+                   /*
                     ,(SELECT 
                         CONCAT(firstname, ' ',lastname) as Name 
                     FROM 
@@ -1181,14 +1188,17 @@ class StocksController extends Controller
                     WHERE 
                         id = '" . $_SESSION['userno'] . "'
                     ) as user
+                    */
+                    ,CONCAT(e.firstname, ' ',e.lastname) as Name 
                     ,completedate 
                 FROM 
-                    StockAlignTransact 
+                    StockAlignTransact a
+                    LEFT JOIN  StockAlignUsers e ON a.userid = e.id
                 WHERE 
-                    status = '" . $page . "'
+                    a.status = '" . $page . "'
                     " . $concat . "
                 ORDER BY
-                    inputdate DESC
+                    a.inputdate DESC
                     ";
         $stmt = $pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

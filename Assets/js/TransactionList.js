@@ -23,7 +23,7 @@ function loadList() {
         { data: 'materialcode' },
         { data: 'company' },
         { data: 'source' },
-        { data: 'user' },
+        { data: 'Name' },
     ];
     let columnDefsVal = [];
     let columnDefs = "";
