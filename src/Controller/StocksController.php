@@ -152,10 +152,10 @@ class StocksController extends Controller
         }
 
 
-        $returnTr .= '<tr><td>SAP</td><td><span class="badge bg-primary">' . $sQty . '</span></td></tr>';
+        echo  '<tr><td>SAP</td><td><span class="badge bg-primary">' . $sQty . '</span></td></tr>';
 
-
-
+        
+        $shopee = null;
         try {
             $stmtShopee = $pdo->prepare("SELECT productid, skuid, sku FROM StockAlignSku WHERE accttype='SHOPEE' AND company = ? AND COALESCE(sku, parentsku) = ?");
             $stmtShopee->execute([$company, $materialcode]);
@@ -166,8 +166,15 @@ class StocksController extends Controller
         }
 
 
-        $shopeeID = $shopee["productid"];
-        $shopeeSku = $shopee["sku"];
+
+        if(empty($shopee)) {
+           echo  '<tr><td>SHOPEE</td><td><span class="badge bg-danger">Not in masterlists</span></td></tr>';
+        }else{
+
+
+
+             $shopeeID = $shopee["productid"];
+            $shopeeSku = $shopee["sku"];
 
         // check shopee token | qty
         $shopeeStock = 0;
@@ -179,6 +186,8 @@ class StocksController extends Controller
         }
 
         $jsonQty = $this->getStocksFromShopee($shopeeID, $compPrefix, $base_info);
+
+
             $jsonDecodeShopee = json_decode($jsonQty, true);
 
               if (isset($jsonDecodeShopee["message"])) {
@@ -214,11 +223,11 @@ class StocksController extends Controller
                 }
             }
 
+
+                echo  '<tr><td>SHOPEE</td><td><span class="badge bg-warning">' . $shopeeStock . '</span></td></tr>';
+
+        }
        
-
-
-
-        $returnTr .= '<tr><td>SHOPEE</td><td><span class="badge bg-warning">' . $shopeeStock . '</span></td></tr>';
 
 
 
@@ -226,7 +235,11 @@ class StocksController extends Controller
         $stmtLazada->execute([$company, $materialcode]);
         $lazada = $stmtLazada->fetch(PDO::FETCH_ASSOC);
 
-        $lazadaID = $lazada["productid"];
+        if(empty($lazada)) {
+              echo  '<tr><td>LAZADA</td><td><span class="badge bg-danger">Not in masterlists</span></td></tr>';
+        }else{
+
+              $lazadaID = $lazada["productid"];
         //check lazada token | qty
         $lazadaStock = 0;
         $jsonDecodeLazada = $this->getLazadaItem($lazadaID, $materialcode, $compPrefix);
@@ -243,9 +256,12 @@ class StocksController extends Controller
                 }
             }
         }
-        $returnTr .= '<tr><td>LAZADA</td><td><span class="badge bg-info">' . $lazadaStock . '</span></td></tr>';
+       echo  '<tr><td>LAZADA</td><td><span class="badge bg-info">' . $lazadaStock . '</span></td></tr>';
 
-        echo $returnTr;
+        }
+
+      
+
     }
 
 

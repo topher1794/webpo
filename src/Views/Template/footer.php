@@ -3,7 +3,7 @@
       <b>Version</b> 2.0
     </div> -->
   <div align="center">
-    <strong>&copy; 2022 <a href="#">Stock Alignment Project</a>.</strong> All rights reserved.
+    <strong>&copy; 2025 <a href="#">Stock Alignment Project</a>.</strong> All rights reserved.
   </div>
 </footer>
 
