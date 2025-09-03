@@ -102,7 +102,7 @@
 									</div>
 									<hr>
 									<div class="text-center">
-										<h1 class="h4 mb-4"><strong>Stock Alignment</strong></h1>
+										<h1 class="h4 mb-4"><strong>WEB P.O Automation</strong></h1>
 									</div>
 
 									<div class="form-group" id="profilepicdiv" style="display:none">
@@ -172,13 +172,35 @@
 			</div>
 		</div>
 	</div>
-
 	<!-- jQuery -->
 	<script src="Assets/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
 	<script src="Assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="Assets/dist/js/adminlte.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js"></script>
+
+
+	<script> 
+
+	
+
+
+		// function sendLogin() {
+		// 	var username = document.getElementById("username").value;
+		// 	var password = document.getElementById("password").value;
+
+		// 	var encryptedPassword = encryptData(password);
+
+		// 	fetch("/login.php", {
+		// 		method: "POST",
+		// 		headers: { "Content-Type": "application/json" },
+		// 		body: JSON.stringify({ username: username, password: encryptedPassword })
+		// 	});
+		// }
+
+	</script>
 
 </body>
 

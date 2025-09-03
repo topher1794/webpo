@@ -1,15 +1,16 @@
+
 <footer class="main-footer sticky-bottom p-1">
   <!-- <div class="float-right d-none d-sm-block">
       <b>Version</b> 2.0
     </div> -->
   <div align="center">
-    <strong>&copy; 2025 <a href="#">Stock Alignment Project</a>.</strong> All rights reserved.
+    <strong>&copy; <?= $PROJECT_YEAR ?> <a href="#"><?= $PROJECT_TITLE ?></a>.</strong> All rights reserved.
   </div>
 </footer>
 
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
-  <!-- Control sidebar content goes here -->
+  
 </aside>
 
 </div>
@@ -66,44 +67,11 @@
 <script type="module" src="Assets/js/ClsAsync.js"></script>
 
 
-<?php if (in_array($controller, array("stocks"))) { ?>
-  <?php if (in_array($action, array("newsync"))) { ?>
-    <script type="module"  src="Assets/js/New.js"></script>
+<?php if (in_array($controller, array("po"))) { ?>
+  <?php if (in_array($action, array("newpo"))) { ?>
+    <script type="module"  src="Assets/js/NewPo.js"></script>
   <?php } ?>
-  <?php if (in_array($action, array("logs"))) { ?>
-    <script type="module"  src="Assets/js/TransactionList.js"></script>
-  <?php } ?>
-  <?php if (in_array($action, array("checkstock"))) { ?>
-    <script type="module"  src="Assets/js/CheckStock.js"></script>
-  <?php } ?>
-
 <?php } ?>
-
-
-<?php if (in_array($controller, array("master"))) { ?>
-
-
-  <?php if (in_array($action, array("sku"))) { ?>
-    <script type="module"  src="Assets/js/Sku.js"></script>
-  <?php } ?>
-  
-  <?php if (in_array($action, array("users"))) { ?>
-    <script type="module"  src="Assets/js/Users.js"></script>
-  <?php } ?>
-
-  
-<?php } ?>
-
-
-
-<?php if (in_array($controller, array("settings"))) { ?>
-
-  <?php if (in_array($action, array("settings"))) { ?>
-    <script type="module"  src="Assets/js/Settings.js"></script>
-  <?php } ?>
-  
-<?php } ?>
-
 
 
 </body>

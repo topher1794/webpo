@@ -2,15 +2,49 @@ $(document).ready(() => {
     $('.alert').hide();
 })
 
+$(document).ready(() => {
+    $('.alert').hide();
+})
+
+
+var key = "";
+async function ajaxSend(url, method, data) {
+
+    const result = await
+
+        $.ajax({
+            type: method,
+            url: url,
+            data: data,
+        });
+
+    return result;
+}
+
+
+
+$(async function () {
+
+    let url = "getKey";
+    key = await ajaxSend(url, 'GET', {});
+
+});
+
+function encryptData(plainText, publicKey) {
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(publicKey);
+    return encrypt.encrypt(plainText);
+}
+
 $(document).on('submit', '#loginFrm', async function (e) {
     e.preventDefault();
 
 
-
+    let InputPassword = encryptData( $('#InputPassword').val(), key);
     // Example of making a POST request
     const newUser = {
-        InputEmail: $('#InputEmail').val(),
-        InputPassword: $('#InputPassword').val()
+        InputEmail:  encryptData( $('#InputEmail').val(), key),
+        InputPassword: InputPassword
     };
 
     fetchData('userAuthen', 'POST', newUser)
@@ -25,7 +59,7 @@ $(document).on('submit', '#loginFrm', async function (e) {
 
                 }, 3000);
             } else {
-                window.location.href = 'home';
+                window.location.href = 'dashboard';
             }
 
         })

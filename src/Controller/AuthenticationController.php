@@ -1,19 +1,20 @@
 <?php
 
-namespace stockalignment\Controller;
+namespace webpo\Controller;
 
-use stockalignment\Core\Database;
-use stockalignment\Controller;
-// use stockalignment\Jwt;
+use webpo\Core\Database;
+use webpo\Controller;
+// use webpo\Jwt;
 use PDO;
 // use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use InvalidArgumentException;
 use Exception;
-use stockalignment\Controller\StocksController;
-use stockalignment\Classes\Jwt;
+use webpo\Controller\SecurityController;
+use webpo\Classes\Jwt;
 
-session_start();
+
+// session_start();
 
 
 class AuthenticationController extends Controller
@@ -40,16 +41,14 @@ class AuthenticationController extends Controller
     {
         $data['title'] = "LOGIN";
         $haveSession = $_SESSION["userno"] ?? "";
-        // echo $haveSession;
-        // exit();
         if (!empty($haveSession)) {
-            $stkController = new StocksController();
-            $stkController->dashboard();
+            $webpoController = new PoController();
+            $webpoController->dashboard();
             exit();
         }
         $this->render('Login/login.php', $data);
     }
-   
+
     public function userAuthenticate()
     {
         $jsonData = file_get_contents('php://input');
@@ -58,35 +57,61 @@ class AuthenticationController extends Controller
         $email = $data['InputEmail'] ?? "";
         $password = $data['InputPassword'] ?? "";
 
-        $message = "";
+        $clsSecurity = new SecurityController();
+
+        $privateKey = file_get_contents(WPA_PATH . "/private.pem");
+
+
+
+        $password = $clsSecurity->tryDecrypt($password, $privateKey);
+        $email = $clsSecurity->tryDecrypt($email, $privateKey);
+
+        if (!($password !== false)) {
+
+
+            $response = ['status' => 'error', 'message' => 'Invalid characters'];
+            header('Content-Type: application/json');
+            echo json_encode($response);
+
+            exit();
+        }
+
 
         $pdo = $this->database->getPdo();
 
 
-        $stmt = $pdo->prepare("SELECT id, bcrypt_pass as password, firstname, lastname, company, access_role FROM StockAlignUsers WHERE username = :username");
+        $stmt = $pdo->prepare("SELECT g.*, p.plantcode, p.dept, p.levelno FROM gpa_employee g , po_user p	
+        WHERE p.userno::bigint = g.userno 
+        AND  g.uname = :username
+        AND g.pword = :password");
         $stmt->bindParam(':username', $email);
+        $stmt->bindParam(':password', $password);
+
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user) {
-            $stored_hash = $user['password'];
 
-            if (password_verify($password, $stored_hash)) {
-                // Process $results
-                $_SESSION["userno"] = $user['id'];
-                $_SESSION["company"] = $user['company'];
-                $_SESSION["firstname"] = $user['firstname'];
-                $_SESSION["lastname"] = $user['lastname'];
-                $_SESSION["role"] = $user['access_role'];
-                $response = ['status' => 'success', 'message' => 'Login successful'];
-                header('Content-Type: application/json');
-                echo json_encode($response);
-                exit;
-            } else {
-                // Password does not match.
-                $message = "Invalid password.";
-                $status = "error";
+        if ($user) {
+            $_SESSION["userno"] = $user["userno"];
+            $_SESSION["dept"] = $user["dept"];
+            $_SESSION["plantcode"] = $user["plantcode"];
+
+            $activename = $user['empname'];
+
+            $imgLogo = "uratex-logo.png";
+            if (substr($_SESSION["plantcode"], 0, 1) == "6") {
+                $imgLogo = "roberts.png";
             }
+
+            $_SESSION["imgLogo"] = $imgLogo;
+
+
+
+
+            $response = ['status' => 'success', 'message' => 'Login successful'];
+            header('Content-Type: application/json');
+            echo json_encode($response);
+            exit;
         } else {
             $message = "Email Address not found";
             $status = "error";
@@ -228,6 +253,8 @@ class AuthenticationController extends Controller
 
         $bearerToken = getallheaders()["Authorization"] ?? "";
         $bearerToken = str_replace("Bearer ", "", $bearerToken);
+
+
 
         // print_r($bearerToken);
 

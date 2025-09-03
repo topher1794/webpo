@@ -1,14 +1,13 @@
 <?php
 
-namespace stockalignment;
+namespace webpo;
 
-use stockalignment\Core\Database;
-use stockalignment\Controller\AuthenticationController;
+use webpo\Core\Database;
+use webpo\Controller\AuthenticationController;
 
 // use ccms\Controller\HomeController;
 use Exception;
-use stockalignment\Model\UserModel;
-
+use webpo\Model\UserModel;
 
 
 class Router
@@ -40,31 +39,8 @@ class Router
         $uri = strtok($_SERVER['REQUEST_URI'], '?');
         $method =  $_SERVER['REQUEST_METHOD'];
 
-        // $host= $_SERVER['HTTP_HOST'];
-        // $BASE_URL_QAS = "";
-        // if (strpos($uri, "_qas") !== FALSE || strpos($uri, "localhost") !== FALSE) {
-        //     $BASE_URL_QAS = "_qas";
-        // }
-
-        // $uri = str_replace(BASE_URL . $BASE_URL_QAS, "", $uri);
-        // echo "uri:".$uri;
-
-        // print_r($_SERVER);
-
         $uri = str_replace(BASE_URL . BASE_URLQAS, "", $uri);
       
-
-        // echo "</br>".BASE_URL;
-        // echo "</br>".SUFFIX_QAS;
-
-        // echo $uri;
-
-
-        // print_r($this->routes);
-        // print_r( $method);
-        // echo $uri;
-        // exit();
-
         if (array_key_exists($uri, $this->routes[$method])) {
             $controller = $this->routes[$method][$uri]['controller'];
             $action = $this->routes[$method][$uri]['action'];
@@ -76,33 +52,13 @@ class Router
             $arrayUri = explode("/", $_SERVER['REQUEST_URI']);
             array_splice($arrayUri, 0, 1);
             $skipSession = array(
-                "getStocks",
                 "/",
                 "userAuthen",
-                "getRemittedConsignment",
-                "getItemFromShopee",
-                "getAccessToken",
-                "getAccessTokenLazada",
-                "registration",
-                "newRegistration",
-                "syncviaform",
-                "Logout",
-                "refreshLazadaToken",
-                "getLazadaItem",
-                "swaggerapi",
-                "updatestockv1",
-                "apitokenv1",
-                "apirefreshtokenv1",
-                "checkstockqty", //should be comment
+                "getKey",
             );
-            // print_r($uri);
-            // exit();
+           
             $linkUrl = $arrayUri[1];
             if (!in_array($linkUrl, $skipSession)) {
-                // print_r($_SESSION["userno"]) ;
-                //     echo "sssss";
-                //     exit();
-
                 if (empty($_SESSION["userno"])) {
                     $AuthenticationController = new AuthenticationController();
                     $AuthenticationController->index();
@@ -115,22 +71,17 @@ class Router
                 switch ($linkUrl) {
                     case "registration":
                     case "newRegistration":
-                        $model = new UserModel($pdo);
+                        // $model = new UserModel($pdo);
                         break;
                     default:
                         $model = null;
                 }
-                // echo "hhhhh";
-                // exit();
                 $controller = new $controller($model);
                 $controller->$action();
             } catch (Exception $e) {
             }
         } else {
-            // echo "No route found for URI: $uri";
             http_response_code(404);
-            // $page404 = new AuthenticationController();
-            // $page404->page404();
             exit();
         }
     }

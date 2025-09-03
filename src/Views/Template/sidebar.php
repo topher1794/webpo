@@ -1,12 +1,11 @@
-<!-- Main Sidebar Container -->
 <aside class="main-sidebar main-sidebar-custom sidebar-light-primary elevation-4">
   <!-- Brand Logo -->
+   <!-- Web P.O Automation  -->
   <a style="background-color: #57A8FF;" href="#" class="brand-link">
-    <img src="Assets/assets/images/uratex-logo.png" alt="ddd" class="brand-image" style="opacity: .8">&nbsp;
-    <span style="font-size: 15px;" class="brand-text font-weight-bold" id="titlespan"><strong>Stock Alignment</strong></span>
+    <img src="Assets/assets/images/<?= $_SESSION["imgLogo"] ?>" alt="image logo" class="brand-image" style="opacity: .8">&nbsp;
+    <span style="font-size: 15px;" class="brand-text font-weight-bold" id="titlespan"><strong><?php echo $PROJECT_TITLE; ?></strong></span>
   </a>
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -16,6 +15,16 @@
             <i class="fas fa-home nav-icon" aria-hidden="true"></i>
             <p>
               Home
+            </p>
+          </a>
+        </li>
+
+
+        <li class="nav-item" id="li-new">
+          <a href="newPo" class="nav-link" id="lia-new" onclick="menuclick(this.id)">
+            <i class="fas fa-tachometer-alt nav-icon" aria-hidden="true"></i>
+            <p>
+              New
             </p>
           </a>
         </li>

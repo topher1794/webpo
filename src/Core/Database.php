@@ -1,6 +1,6 @@
 <?php
 
-namespace stockalignment\Core;
+namespace webpo\Core;
 
 use PDO;
 use PDOException;
@@ -19,12 +19,15 @@ class Database
 
     private function __construct()
     {
+
+       
+
+
         $host = getenv('DB_HOST'); // Use environment variables for secrets
         $dbname = getenv('DB_NAME');
         $username = getenv('DB_USERNAME');
         $password = getenv('DB_PASSWORD');
 
-        $host = "10.0.120.180";
         // $host = "localhost";
 
 
@@ -32,38 +35,32 @@ class Database
 
         $absolutePath =  __FILE__;
 
-        $this->SAPIP = "10.0.220.168";
+        $host = "10.0.0.9";
+        $username = "topher";
+        $password = "t0p_Jul2014";
 
-
-
-        $dbname = "";
+        $dbname = "it";
         if (
             // strpos($_SERVER['HTTP_HOST'], "localhost") !== false || strpos($_SERVER['REQUEST_URI'], "localhost") !== false
             strpos(strtoupper(SUFFIX_QAS), "QAS") !== FALSE
             || 
             strpos(strtoupper($absolutePath), "QAS") !== FALSE
         ) {
-            $dbname = "_qas";
-            $this->SAPPort = "8001";
-            $this->SAPIP = "10.0.220.165";
+            $dbname .= "_qas";
+          
         }
-        $this->SAPPort = "8002";
-        $this->SAPIP = "10.0.220.168";
-        $dbname = "ccms" . $dbname;
-        $dbname = "uratexportal_DOPDBQAS";
-
-        $this->DBASE = $dbname;
-
-        $this->SAPUser = "mis_api";
-        $this->SAPPword = "ur@t3x";
-
-
-
-        $username = "uratexportal";
-        $password = "uratex@1968";
-
         try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+
+            $dsn = "pgsql:host=$host;port=5432;dbname=$dbname;";
+
+		// make a database connection
+            $this->pdo = new PDO(
+                $dsn,
+                $username,
+                $password,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Error connecting to database: " . $e->getMessage());
@@ -108,5 +105,12 @@ class Database
         $statement = $this->pdo->prepare($sql);
         $statement->execute($params);
         return $statement->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getSQLAllRows(String $sql, array $params)
+    {
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute($params);
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -1,12 +1,13 @@
 {
     "autoload": {
         "psr-4": {
-            "stockalignment\\" : "src/"
+            "webpo\\" : "src/"
         }
     },
     "require": {
         "firebase/php-jwt": "^6.10",
-        "appolous/lazada-php-sdk": "^1.6"
+        "appolous/lazada-php-sdk": "^1.6",
+        "google/cloud-storage": "^1.48"
     },
     "require-dev": {
         "phpunit/phpunit": "10"
